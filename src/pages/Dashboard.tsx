@@ -2,8 +2,6 @@
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FloatingActionButton } from '../components/UI/FloatingActionButton';
-import { SlideUpModal } from '../components/UI/SlideUpModal';
 import { Calendar, Clock, Users, DollarSign, ChefHat, Heart } from 'lucide-react';
 
 const upcomingMeals = [
@@ -21,7 +19,6 @@ const suggestedRecipes = [
 const filterTags = ['All', 'Quick', 'Healthy', 'Vegetarian', 'Low Carb', 'Family'];
 
 export function Dashboard() {
-  const [showQuickActions, setShowQuickActions] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
 
   return (
@@ -120,23 +117,6 @@ export function Dashboard() {
           ))}
         </div>
       </div>
-
-      {/* Floating Action Button */}
-      <FloatingActionButton onClick={() => setShowQuickActions(true)} />
-
-      {/* Quick Actions Modal */}
-      <SlideUpModal
-        isOpen={showQuickActions}
-        onClose={() => setShowQuickActions(false)}
-        title="Quick Actions"
-      >
-        <div className="space-y-4">
-          <Button className="w-full">Add New Recipe</Button>
-          <Button className="w-full" variant="secondary">Plan a Meal</Button>
-          <Button className="w-full" variant="secondary">Add to Shopping List</Button>
-          <Button className="w-full" variant="secondary">Check Pantry</Button>
-        </div>
-      </SlideUpModal>
     </div>
   );
 }
