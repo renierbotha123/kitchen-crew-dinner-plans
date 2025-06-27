@@ -65,7 +65,7 @@ export function Dashboard() {
       <div className="px-4 py-6 space-y-6">
         {/* Enhanced Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <Card className="p-4">
+          <div className="rounded-3xl border bg-card text-card-foreground p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">12</p>
@@ -73,9 +73,9 @@ export function Dashboard() {
               </div>
               <Calendar className="w-8 h-8 text-primary" />
             </div>
-          </Card>
+          </div>
           
-          <Card className="p-4">
+          <div className="rounded-3xl border bg-card text-card-foreground p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">$84</p>
@@ -83,9 +83,9 @@ export function Dashboard() {
               </div>
               <DollarSign className="w-8 h-8 text-primary" />
             </div>
-          </Card>
+          </div>
 
-          <Card className="p-4">
+          <div className="rounded-3xl border bg-card text-card-foreground p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">4</p>
@@ -93,9 +93,9 @@ export function Dashboard() {
               </div>
               <Users className="w-8 h-8 text-primary" />
             </div>
-          </Card>
+          </div>
 
-          <Card className="p-4">
+          <div className="rounded-3xl border bg-card text-card-foreground p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">23</p>
@@ -103,7 +103,7 @@ export function Dashboard() {
               </div>
               <ShoppingCart className="w-8 h-8 text-primary" />
             </div>
-          </Card>
+          </div>
         </div>
 
         {/* Priority Meal Planning Cards */}
@@ -111,7 +111,7 @@ export function Dashboard() {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Priority Meals</h2>
           <div className="space-y-3">
             {priorityMeals.map((meal) => (
-              <Card key={meal.id} className="p-4">
+              <div key={meal.id} className="rounded-3xl border bg-card text-card-foreground p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <h3 className="font-medium text-gray-900 dark:text-gray-100">{meal.title}</h3>
@@ -121,11 +121,11 @@ export function Dashboard() {
                       {meal.time}
                     </p>
                   </div>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(meal.status)}`}>
+                  <span className={`px-3 py-1 rounded-2xl text-xs font-medium ${getStatusColor(meal.status)}`}>
                     {meal.status}
                   </span>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         </div>
@@ -135,7 +135,7 @@ export function Dashboard() {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Upcoming Meals</h2>
           <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
             {upcomingMeals.map((meal) => (
-              <Card key={meal.id} className={`min-w-[280px] snap-center overflow-hidden border-l-4 ${getPriorityColor(meal.priority)}`}>
+              <div key={meal.id} className={`min-w-[280px] snap-center overflow-hidden rounded-3xl border bg-card text-card-foreground border-l-4 ${getPriorityColor(meal.priority)}`}>
                 <img 
                   src={meal.image} 
                   alt={meal.title}
@@ -148,7 +148,7 @@ export function Dashboard() {
                     {meal.time}
                   </p>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         </div>
@@ -156,14 +156,14 @@ export function Dashboard() {
         {/* Member Activity Feed */}
         <div>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Family Activity</h2>
-          <Card className="p-4">
+          <div className="rounded-3xl border bg-card text-card-foreground p-4">
             <div className="space-y-4">
               {memberActivity.map((activity) => (
                 <div key={activity.id} className="flex items-start space-x-3">
                   <img 
                     src={activity.avatar} 
                     alt={activity.member}
-                    className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700"
+                    className="w-8 h-8 rounded-2xl bg-gray-200 dark:bg-gray-700"
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-900 dark:text-gray-100">
@@ -174,7 +174,7 @@ export function Dashboard() {
                 </div>
               ))}
             </div>
-          </Card>
+          </div>
         </div>
 
         {/* Filter Tags */}
@@ -185,7 +185,7 @@ export function Dashboard() {
               <button
                 key={tag}
                 onClick={() => setActiveFilter(tag)}
-                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                className={`px-4 py-2 rounded-2xl text-sm font-medium whitespace-nowrap transition-colors ${
                   activeFilter === tag
                     ? 'bg-primary text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -200,7 +200,7 @@ export function Dashboard() {
         {/* Enhanced Suggested Recipes */}
         <div className="grid grid-cols-2 gap-4">
           {suggestedRecipes.map((recipe) => (
-            <Card key={recipe.id} className="overflow-hidden">
+            <div key={recipe.id} className="overflow-hidden rounded-3xl border bg-card text-card-foreground">
               <img 
                 src={recipe.image} 
                 alt={recipe.title}
@@ -215,12 +215,12 @@ export function Dashboard() {
                     <span className="text-xs text-gray-600 dark:text-gray-400">{recipe.rating}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Button size="sm" variant="outline" className="text-xs">View</Button>
+                    <Button size="sm" variant="outline" className="text-xs rounded-2xl">View</Button>
                     <Heart className="w-4 h-4 text-gray-400 hover:text-red-500 cursor-pointer" />
                   </div>
                 </div>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       </div>
@@ -235,19 +235,19 @@ export function Dashboard() {
         title="Quick Actions"
       >
         <div className="space-y-4">
-          <Button className="w-full flex items-center justify-center">
+          <Button className="w-full flex items-center justify-center rounded-2xl">
             <ChefHat className="w-4 h-4 mr-2" />
             Add New Recipe
           </Button>
-          <Button className="w-full flex items-center justify-center" variant="secondary">
+          <Button className="w-full flex items-center justify-center rounded-2xl" variant="secondary">
             <Calendar className="w-4 h-4 mr-2" />
             Plan a Meal
           </Button>
-          <Button className="w-full flex items-center justify-center" variant="secondary">
+          <Button className="w-full flex items-center justify-center rounded-2xl" variant="secondary">
             <ShoppingCart className="w-4 h-4 mr-2" />
             Add to Shopping List
           </Button>
-          <Button className="w-full flex items-center justify-center" variant="secondary">
+          <Button className="w-full flex items-center justify-center rounded-2xl" variant="secondary">
             <TrendingUp className="w-4 h-4 mr-2" />
             Check Pantry
           </Button>
