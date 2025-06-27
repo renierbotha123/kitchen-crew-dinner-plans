@@ -83,7 +83,7 @@ export function AddMealModal({ isOpen, onClose, onAddMeal, selectedDate, availab
                 onClick={() => setSelectedRecipe(recipe.id)}
               >
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded-lg overflow-hidden">
+                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded-sm overflow-hidden">
                     <img 
                       src={recipe.image} 
                       alt={recipe.title}
