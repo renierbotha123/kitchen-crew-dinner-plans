@@ -1,9 +1,8 @@
 
 import React, { useState } from 'react';
-import { SlideUpModal } from '@/components/UI/SlideUpModal';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Clock, Users, ChefHat, Search } from 'lucide-react';
+import { Clock, Users, ChefHat, Search, ArrowLeft } from 'lucide-react';
 
 interface AddMealModalProps {
   isOpen: boolean;
@@ -40,10 +39,23 @@ export function AddMealModal({ isOpen, onClose, onAddMeal, selectedDate, availab
     recipe.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  if (!isOpen) return null;
+
   return (
-    <SlideUpModal isOpen={isOpen} onClose={onClose} title="Add Meal">
-      <div className="flex flex-col h-full pb-20">
-        {/* Selected Date - More compact */}
+    <div className="fixed inset-0 z-50 bg-white dark:bg-gray-900">
+      {/* Header with back button and title */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-6 pt-12 sticky top-0 z-10">
+        <div className="flex items-center space-x-3 mb-4">
+          <button
+            onClick={onClose}
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+          </button>
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Add Meal</h1>
+        </div>
+
+        {/* Selected Date */}
         {selectedDate && (
           <div className="text-center p-2 bg-gray-50 dark:bg-gray-700 rounded-lg mb-4">
             <p className="text-xs text-gray-600 dark:text-gray-400">Adding meal for</p>
@@ -53,7 +65,7 @@ export function AddMealModal({ isOpen, onClose, onAddMeal, selectedDate, availab
           </div>
         )}
 
-        {/* Meal Type Selection - More compact */}
+        {/* Meal Type Selection */}
         <div className="mb-4">
           <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
             Meal Type
@@ -86,83 +98,79 @@ export function AddMealModal({ isOpen, onClose, onAddMeal, selectedDate, availab
             />
           </div>
         </div>
+      </div>
 
-        {/* Recipe Selection - Flexible height */}
-        <div className="flex-1 min-h-0">
-          <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
-            Choose Recipe ({filteredRecipes.length})
-          </h3>
-          <div className="space-y-2 h-full overflow-y-auto pr-1">
-            {filteredRecipes.map(recipe => (
-              <Card
-                key={recipe.id}
-                className={`p-3 cursor-pointer transition-all duration-200 rounded-xl ${
-                  selectedRecipe === recipe.id 
-                    ? 'ring-2 ring-primary bg-primary/5' 
-                    : 'hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-                onClick={() => setSelectedRecipe(recipe.id)}
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gray-200 dark:bg-gray-600 rounded-lg overflow-hidden flex-shrink-0">
-                    <img 
-                      src={recipe.image} 
-                      alt={recipe.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm truncate">
-                      {recipe.title}
-                    </h4>
-                    <div className="flex items-center space-x-2 text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-                      <div className="flex items-center space-x-1">
-                        <ChefHat className="w-3 h-3" />
-                        <span>{recipe.prepTime}m</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="w-3 h-3" />
-                        <span>{recipe.cookTime}m</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Users className="w-3 h-3" />
-                        <span>{recipe.serves}</span>
-                      </div>
-                    </div>
-                  </div>
-                  {selectedRecipe === recipe.id && (
-                    <div className="w-4 h-4 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
-                      <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
-                    </div>
-                  )}
-                </div>
-              </Card>
-            ))}
-            {filteredRecipes.length === 0 && (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                <p className="text-sm">No recipes found</p>
-                <p className="text-xs mt-1">Try adjusting your search</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Fixed Actions at bottom */}
-        <div className="fixed bottom-20 left-0 right-0 p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex space-x-3">
-            <Button 
-              onClick={handleAddMeal} 
-              disabled={!selectedRecipe}
-              className="flex-1"
+      {/* Content - Recipe Selection */}
+      <div className="flex-1 px-4 py-2 pb-20 h-full overflow-y-auto">
+        <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">
+          Choose Recipe ({filteredRecipes.length})
+        </h3>
+        
+        <div className="space-y-3">
+          {filteredRecipes.map(recipe => (
+            <Card
+              key={recipe.id}
+              className={`p-4 cursor-pointer transition-all duration-200 rounded-xl ${
+                selectedRecipe === recipe.id 
+                  ? 'ring-2 ring-primary bg-primary/5' 
+                  : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
+              onClick={() => setSelectedRecipe(recipe.id)}
             >
-              Add Meal
-            </Button>
-            <Button variant="outline" onClick={onClose} className="flex-1">
-              Cancel
-            </Button>
-          </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded-xl overflow-hidden flex-shrink-0">
+                  <img 
+                    src={recipe.image} 
+                    alt={recipe.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-medium text-gray-900 dark:text-gray-100 text-base truncate mb-1">
+                    {recipe.title}
+                  </h4>
+                  <div className="flex items-center space-x-3 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center space-x-1">
+                      <ChefHat className="w-3.5 h-3.5" />
+                      <span>{recipe.prepTime}m</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>{recipe.cookTime}m</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Users className="w-3.5 h-3.5" />
+                      <span>{recipe.serves}</span>
+                    </div>
+                  </div>
+                </div>
+                {selectedRecipe === recipe.id && (
+                  <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                  </div>
+                )}
+              </div>
+            </Card>
+          ))}
+          {filteredRecipes.length === 0 && (
+            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+              <p className="text-base">No recipes found</p>
+              <p className="text-sm mt-1">Try adjusting your search</p>
+            </div>
+          )}
         </div>
       </div>
-    </SlideUpModal>
+
+      {/* Fixed Add Meal Button in nav tray space */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4">
+        <Button 
+          onClick={handleAddMeal} 
+          disabled={!selectedRecipe}
+          className="w-full h-12"
+        >
+          Add Meal
+        </Button>
+      </div>
+    </div>
   );
 }
