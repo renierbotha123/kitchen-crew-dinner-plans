@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import { Card } from '../components/UI/Card';
-import { Button } from '../components/UI/Button';
-import { Checkbox } from '../components/UI/checkbox';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
 
 const cartItems = [

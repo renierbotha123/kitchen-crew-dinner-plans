@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import { Card } from '../components/UI/Card';
-import { Button } from '../components/UI/Button';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { useTheme } from '../contexts/ThemeContext';
 import { User, Settings, Users, Share2, Moon, Sun, Bell, Heart, Star } from 'lucide-react';
 

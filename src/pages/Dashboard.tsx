@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import { Card } from '../components/UI/Card';
-import { Button } from '../components/UI/Button';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { FloatingActionButton } from '../components/UI/FloatingActionButton';
 import { SlideUpModal } from '../components/UI/SlideUpModal';
 import { Calendar, Clock, Users, DollarSign, ChefHat, Heart } from 'lucide-react';

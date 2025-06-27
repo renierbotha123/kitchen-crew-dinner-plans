@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import { Card } from '../components/UI/Card';
-import { Button } from '../components/UI/Button';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 
 const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -52,14 +52,14 @@ export function Calendar() {
           <div className="flex space-x-2">
             <Button
               size="sm"
-              variant={viewMode === 'week' ? 'primary' : 'secondary'}
+              variant={viewMode === 'week' ? 'default' : 'secondary'}
               onClick={() => setViewMode('week')}
             >
               Week
             </Button>
             <Button
               size="sm"
-              variant={viewMode === 'month' ? 'primary' : 'secondary'}
+              variant={viewMode === 'month' ? 'default' : 'secondary'}
               onClick={() => setViewMode('month')}
             >
               Month
