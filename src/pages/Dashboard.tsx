@@ -14,11 +14,11 @@ import { RecipeCard } from '@/components/Dashboard/RecipeCard';
 const upcomingMeal = {
   id: '1',
   image: '/placeholder.svg',
-  title: 'Spaghetti Carbonara',
+  title: 'Harissa-rubbed chicken with heirloom tomato salad',
   type: 'Dinner',
-  tags: ['Chicken', 'Italian'],
-  prepTime: '15 min',
-  cookTime: '20 min',
+  tags: ['Chicken'],
+  prepTime: '20 min',
+  cookTime: '10 min',
   serves: 4
 };
 
@@ -26,32 +26,32 @@ const mealsAhead = [
   {
     id: '1',
     image: '/placeholder.svg',
-    title: 'Greek Salad',
-    date: 'Dec 28',
-    day: 'Tomorrow',
-    tags: ['Vegetarian', 'Healthy'],
+    title: 'Tasty Chicken Ala king with cauliflower rice',
+    date: 'Jun 23rd',
+    day: 'Today',
+    tags: ['Chicken', 'Breakfast'],
     ingredientsCount: 6,
     totalIngredients: 7
   },
   {
     id: '2',
     image: '/placeholder.svg',
-    title: 'Beef Tacos',
-    date: 'Dec 29',
-    day: 'Sunday',
-    tags: ['Meat', 'Mexican'],
-    ingredientsCount: 8,
-    totalIngredients: 10
+    title: 'Venison steak salad',
+    date: 'Jun 24th',
+    day: 'Tuesday',
+    tags: ['Meat'],
+    ingredientsCount: 6,
+    totalIngredients: 7
   },
   {
     id: '3',
     image: '/placeholder.svg',
-    title: 'Pancakes',
-    date: 'Dec 30',
-    day: 'Monday',
-    tags: ['Breakfast', 'Sweet'],
-    ingredientsCount: 5,
-    totalIngredients: 6
+    title: 'Quick and easy pan tikka fish rolls',
+    date: 'Jun 25th',
+    day: 'Wednesday',
+    tags: ['Fish'],
+    ingredientsCount: 6,
+    totalIngredients: 7
   }
 ];
 
@@ -59,48 +59,54 @@ const priorityItems = [
   {
     id: '1',
     type: 'ingredient' as const,
-    text: 'Buy fresh basil',
-    completed: false
+    text: '6 pack milk',
+    completed: true
   },
   {
     id: '2',
     type: 'ingredient' as const,
-    text: 'Get parmesan cheese',
+    text: '150g mushrooms',
     completed: true
   },
   {
     id: '3',
-    type: 'note' as const,
-    text: 'Remember to marinate chicken tonight',
-    completed: false,
-    memberName: 'Sarah'
+    type: 'ingredient' as const,
+    text: '250g carrots',
+    completed: false
   },
   {
     id: '4',
     type: 'ingredient' as const,
-    text: 'Pick up olive oil',
+    text: 'Apples',
     completed: false
+  },
+  {
+    id: '5',
+    type: 'note' as const,
+    text: 'We need to buy some washing powder',
+    completed: false,
+    memberName: 'Lex'
   }
 ];
 
 const activityFeed = [
-  { id: '1', member: 'John', action: 'added Chicken Parmesan to favorites', time: '2 hours ago', avatar: '/placeholder.svg' },
-  { id: '2', member: 'Sarah', action: 'completed meal prep for Tuesday', time: '4 hours ago', avatar: '/placeholder.svg' },
-  { id: '3', member: 'Mike', action: 'shared a new recipe: Fish Tacos', time: '6 hours ago', avatar: '/placeholder.svg' }
+  { id: '1', member: 'Renier', action: 'Added mushrooms to the household pantry', time: '2 hours ago', avatar: '/placeholder.svg' },
+  { id: '2', member: 'Demi', action: 'Invited Jessica to the household', time: '4 hours ago', avatar: '/placeholder.svg' },
+  { id: '3', member: 'Lex', action: 'Added Note: We need to buy washing powder', time: '6 hours ago', avatar: '/placeholder.svg' }
 ];
 
 const suggestedRecipes = [
-  { id: '1', image: '/placeholder.svg', title: 'Chicken Curry', time: '45 min', difficulty: 'Easy', rating: 4.5 },
-  { id: '2', image: '/placeholder.svg', title: 'Caesar Salad', time: '15 min', difficulty: 'Easy', rating: 4.2 },
-  { id: '3', image: '/placeholder.svg', title: 'Beef Stir Fry', time: '30 min', difficulty: 'Medium', rating: 4.7 },
-  { id: '4', image: '/placeholder.svg', title: 'Fish Tacos', time: '25 min', difficulty: 'Medium', rating: 4.4 }
+  { id: '1', image: '/placeholder.svg', title: 'Toast with egg and avocado', time: '15 min', difficulty: 'Easy', rating: 4.9, chef: 'Jack Black' },
+  { id: '2', image: '/placeholder.svg', title: 'Pork breakfast burger', time: '18 min', difficulty: 'Medium', rating: 4.5, chef: 'Castle on 25' },
+  { id: '3', image: '/placeholder.svg', title: 'Chicken Curry', time: '45 min', difficulty: 'Medium', rating: 4.7, chef: 'Chef Maria' },
+  { id: '4', image: '/placeholder.svg', title: 'Fish Tacos', time: '25 min', difficulty: 'Easy', rating: 4.4, chef: 'Coastal Kitchen' }
 ];
 
-const filterTags = ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Baked', 'Healthy', 'Quick', 'Vegetarian'];
+const filterTags = ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Baked'];
 
 export function Dashboard() {
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState('All');
+  const [activeFilter, setActiveFilter] = useState('Breakfast');
   const [priorityList, setPriorityList] = useState(priorityItems);
 
   const togglePriorityItem = (id: string) => {
@@ -116,7 +122,7 @@ export function Dashboard() {
       {/* 1️⃣ Greeting / Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-6 pt-12">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-          Hello, Sarah 👋
+          Hello, Peter 👋
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-1">
           Here is what you missed
@@ -126,6 +132,9 @@ export function Dashboard() {
       <div className="px-4 py-6 space-y-6">
         {/* 2️⃣ Up-coming Meal */}
         <div>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            Up-coming Meal
+          </h2>
           <UpcomingMealCard 
             meal={upcomingMeal}
             onGoToRecipe={() => navigate('/recipes')}
@@ -148,7 +157,7 @@ export function Dashboard() {
             </ScrollArea>
             
             <Button 
-              variant="outline" 
+              variant="default" 
               className="w-full"
               onClick={() => navigate('/calendar')}
             >
@@ -160,7 +169,7 @@ export function Dashboard() {
         {/* 4️⃣ Priority List */}
         <div>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-            Priority List
+            Priority List:
           </h2>
           
           <div className="space-y-3">
@@ -179,7 +188,7 @@ export function Dashboard() {
             </Card>
             
             <Button 
-              variant="outline" 
+              variant="default" 
               className="w-full"
               onClick={() => console.log('Navigate to Priority List')}
             >
@@ -197,8 +206,8 @@ export function Dashboard() {
           <div className="space-y-4">
             {/* Meals Planned Card */}
             <HighlightCard
-              title="Meals Planned"
-              value={12}
+              title="This Week"
+              value="3 Meals Planned"
               cta="Add more meals"
               onCtaClick={() => navigate('/calendar')}
             />
@@ -206,7 +215,7 @@ export function Dashboard() {
             {/* Week Total Card */}
             <HighlightCard
               title="Week Total"
-              value="$84"
+              value="R950.00 Estimated Cost"
               cta="Review groceries"
               onCtaClick={() => navigate('/cart')}
             />
@@ -215,11 +224,11 @@ export function Dashboard() {
             <HighlightCard
               title="Household Activity"
               value=""
-              cta="View all activity"
-              onCtaClick={() => console.log('Navigate to activity')}
+              cta="Mark as read"
+              onCtaClick={() => console.log('Mark activity as read')}
             >
               <div className="space-y-3">
-                {activityFeed.slice(0, 3).map((activity) => (
+                {activityFeed.map((activity) => (
                   <div key={activity.id} className="flex items-start space-x-3">
                     <img 
                       src={activity.avatar} 
@@ -228,10 +237,10 @@ export function Dashboard() {
                     />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-gray-900 dark:text-gray-100">
-                        <span className="font-medium">{activity.member}</span> {activity.action}
+                        <span className="font-medium">{activity.member}</span>
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                        {activity.time}
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        {activity.action}
                       </p>
                     </div>
                   </div>
@@ -251,16 +260,6 @@ export function Dashboard() {
           <div className="mb-4">
             <ScrollArea className="w-full whitespace-nowrap">
               <div className="flex space-x-2 pb-4">
-                <button
-                  onClick={() => setActiveFilter('All')}
-                  className={`px-4 py-2 rounded-2xl text-sm font-medium whitespace-nowrap transition-colors ${
-                    activeFilter === 'All'
-                      ? 'bg-primary text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  All
-                </button>
                 {filterTags.map((tag) => (
                   <button
                     key={tag}

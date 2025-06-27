@@ -11,6 +11,7 @@ interface RecipeCardProps {
     time: string;
     difficulty: string;
     rating: number;
+    chef?: string;
   };
   onView: () => void;
   onFavorite: () => void;
@@ -19,11 +20,36 @@ interface RecipeCardProps {
 export function RecipeCard({ recipe, onView, onFavorite }: RecipeCardProps) {
   return (
     <Card className="w-64 flex-shrink-0 overflow-hidden">
-      <img 
-        src={recipe.image} 
-        alt={recipe.title}
-        className="w-full h-40 object-cover bg-gray-200 dark:bg-gray-700"
-      />
+      <div className="relative">
+        <img 
+          src={recipe.image} 
+          alt={recipe.title}
+          className="w-full h-40 object-cover bg-gray-200 dark:bg-gray-700"
+        />
+        
+        {/* Chef badge */}
+        {recipe.chef && (
+          <div className="absolute top-3 left-3">
+            <span className="px-2 py-1 bg-black/70 text-white text-xs rounded-2xl">
+              {recipe.chef}
+            </span>
+          </div>
+        )}
+        
+        {/* Rating badge */}
+        <div className="absolute top-3 right-3">
+          <div className="flex items-center gap-1 px-2 py-1 bg-black/70 text-white text-xs rounded-2xl">
+            <Star className="w-3 h-3 text-yellow-400 fill-current" />
+            <span>{recipe.rating}</span>
+          </div>
+        </div>
+        
+        {/* Favorite heart */}
+        <Heart 
+          className="absolute bottom-3 right-3 w-6 h-6 text-white cursor-pointer hover:text-red-500"
+          onClick={onFavorite}
+        />
+      </div>
       
       <div className="p-3 space-y-2">
         <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">
@@ -35,26 +61,6 @@ export function RecipeCard({ recipe, onView, onFavorite }: RecipeCardProps) {
           <span>{recipe.time}</span>
           <span>•</span>
           <span>{recipe.difficulty}</span>
-        </div>
-        
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1">
-            <Star className="w-3 h-3 text-yellow-400 fill-current" />
-            <span className="text-xs text-gray-600 dark:text-gray-400">{recipe.rating}</span>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <button
-              onClick={onView}
-              className="text-xs bg-primary text-white px-3 py-1 rounded-2xl hover:bg-primary/90"
-            >
-              View
-            </button>
-            <Heart 
-              className="w-4 h-4 text-gray-400 hover:text-red-500 cursor-pointer"
-              onClick={onFavorite}
-            />
-          </div>
         </div>
       </div>
     </Card>
