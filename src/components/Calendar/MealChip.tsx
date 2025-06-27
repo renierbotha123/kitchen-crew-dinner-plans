@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { X, Clock, Users, ChefHat } from 'lucide-react';
 
 interface MealChipProps {
   meal: any;
@@ -43,38 +43,50 @@ export function MealChip({ meal, onClick, onRemove, compact = false }: MealChipP
 
   return (
     <div 
-      className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+      className="relative flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
       onClick={onClick}
     >
-      <div className="flex-1">
-        <div className="flex items-center space-x-2 mb-1">
-          <span className="font-medium text-gray-900 dark:text-gray-100 text-sm">
+      {/* Remove button - positioned at top right */}
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={onRemove}
+        className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-900 z-10"
+      >
+        <X className="w-4 h-4 text-red-500" />
+      </Button>
+
+      <div className="flex-1 pr-10">
+        <div className="flex items-center space-x-2 mb-2">
+          <span className="font-semibold text-gray-900 dark:text-gray-100 text-lg">
             {meal.title}
           </span>
           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getMealTypeColor(meal.type)}`}>
             {meal.type}
           </span>
         </div>
-        <div className="flex items-center space-x-3 text-xs text-gray-600 dark:text-gray-400">
-          <span>🍳 {meal.prepTime}min prep</span>
-          <span>⏱️ {meal.cookTime}min cook</span>
-          <span>👥 Serves {meal.serves}</span>
+        
+        <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex items-center space-x-1">
+            <ChefHat className="w-4 h-4" />
+            <span>Prep: {meal.prepTime}min</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <Clock className="w-4 h-4" />
+            <span>Cook: {meal.cookTime}min</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <Users className="w-4 h-4" />
+            <span>Serves {meal.serves}</span>
+          </div>
         </div>
+        
         {meal.missingIngredients && meal.missingIngredients.length > 0 && (
-          <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+          <p className="text-sm text-orange-600 dark:text-orange-400 mt-2">
             Missing: {meal.missingIngredients.join(', ')}
           </p>
         )}
       </div>
-      
-      <Button
-        size="sm"
-        variant="ghost"
-        onClick={onRemove}
-        className="ml-2 h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-900"
-      >
-        <X className="w-4 h-4 text-red-500" />
-      </Button>
     </div>
   );
 }
