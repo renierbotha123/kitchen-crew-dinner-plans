@@ -72,7 +72,7 @@ export function CalendarGrid({ currentDate, meals, onMealClick, onAddMeal, onRem
           return (
             <Card 
               key={index}
-              className={`p-2 min-h-[100px] cursor-pointer transition-colors ${
+              className={`p-2 rounded-lg cursor-pointer transition-colors ${
                 !isCurrentMonthDay ? 'opacity-50' : ''
               } ${isTodayDate ? 'ring-2 ring-primary' : ''}`}
               onClick={() => onAddMeal(formatDate(date))}

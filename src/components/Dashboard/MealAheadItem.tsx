@@ -24,16 +24,18 @@ export function MealAheadItem({ meal }: MealAheadItemProps) {
         className="w-16 h-16 object-cover rounded-2xl bg-gray-200 dark:bg-gray-700 flex-shrink-0"
       />
       
+      {/* Date */}
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {meal.day} • {meal.date}
+        </p>
+
       <div className="flex-1 space-y-2">
         {/* Recipe Title */}
         <h4 className="font-medium text-gray-900 dark:text-gray-100">
           {meal.title}
         </h4>
         
-        {/* Date */}
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          {meal.day} • {meal.date}
-        </p>
+        
         
         {/* Tags */}
         <div className="flex gap-1 flex-wrap">

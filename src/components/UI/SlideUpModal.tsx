@@ -45,7 +45,7 @@ export function SlideUpModal({ isOpen, onClose, children, title }: SlideUpModalP
         )}
         
         {/* Content */}
-        <div className="px-6 py-4 pb-safe overflow-y-auto">
+        <div className="px-3 py-4 pb-safe overflow-y-auto">
           {children}
         </div>
       </div>

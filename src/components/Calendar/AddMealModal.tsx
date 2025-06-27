@@ -71,11 +71,11 @@ export function AddMealModal({ isOpen, onClose, onAddMeal, selectedDate, availab
           <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">
             Choose Recipe
           </h3>
-          <div className="space-y-3 max-h-64 overflow-y-auto">
+          <div className="space-y-3 max-h-64 overflow-y-auto pt-2 pb-6 px-2">
             {availableRecipes.map(recipe => (
               <Card
                 key={recipe.id}
-                className={`p-3 cursor-pointer transition-colors ${
+                className={`p-3 cursor-pointer transition-colors rounded-2xl ${
                   selectedRecipe === recipe.id 
                     ? 'ring-2 ring-primary bg-primary/5' 
                     : 'hover:bg-gray-50 dark:hover:bg-gray-700'
