@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
@@ -138,7 +137,7 @@ export function Dashboard() {
             <CarouselContent className="-ml-2 md:-ml-4">
               {/* Upcoming Meal Card */}
               <CarouselItem className="pl-2 md:pl-4 basis-[90%]">
-                <Card className="p-4 h-[450px] flex flex-col">
+                <Card className="p-4 h-[480px] flex flex-col">
                   <div className="flex-1 space-y-4">
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                       Up-coming Meal
@@ -185,7 +184,7 @@ export function Dashboard() {
 
               {/* Your Meals Ahead Card */}
               <CarouselItem className="pl-2 md:pl-4 basis-[90%]">
-                <Card className="p-4 h-[450px] flex flex-col">
+                <Card className="p-4 h-[480px] flex flex-col">
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
                     Your Meals Ahead
                   </h2>
@@ -244,7 +243,7 @@ export function Dashboard() {
 
               {/* Priority List Card */}
               <CarouselItem className="pl-2 md:pl-4 basis-[90%]">
-                <Card className="p-4 h-[450px] flex flex-col">
+                <Card className="p-4 h-[480px] flex flex-col">
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
                     Priority List
                   </h2>
