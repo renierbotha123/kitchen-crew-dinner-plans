@@ -185,57 +185,55 @@ export function Dashboard() {
               {/* Your Meals Ahead Card */}
               <CarouselItem className="pl-2 md:pl-4 basis-[85%]">
                 <Card className="p-4 h-[520px] flex flex-col">
-                  <div className="flex-1 flex flex-col">
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                      Your Meals Ahead
-                    </h2>
-                    
-                    {/* Scrollable Meals List */}
-                    <ScrollArea className="flex-1">
-                      <div className="space-y-3 pr-4">
-                        {mealsAhead.map((meal) => (
-                          <div key={meal.id} className="flex gap-3 p-3 bg-white dark:bg-gray-800 rounded-2xl border">
-                            {/* Recipe Image Thumbnail */}
-                            <img 
-                              src={meal.image} 
-                              alt={meal.title}
-                              className="w-16 h-16 object-cover rounded-2xl bg-gray-200 dark:bg-gray-700 flex-shrink-0"
-                            />
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                    Your Meals Ahead
+                  </h2>
+                  
+                  {/* Scrollable Meals List */}
+                  <ScrollArea className="flex-1 mb-4">
+                    <div className="space-y-3 pr-4">
+                      {mealsAhead.map((meal) => (
+                        <div key={meal.id} className="flex gap-3 p-3 bg-white dark:bg-gray-800 rounded-2xl border">
+                          {/* Recipe Image Thumbnail */}
+                          <img 
+                            src={meal.image} 
+                            alt={meal.title}
+                            className="w-16 h-16 object-cover rounded-2xl bg-gray-200 dark:bg-gray-700 flex-shrink-0"
+                          />
+                          
+                          <div className="flex-1 space-y-2">
+                            {/* Recipe Title */}
+                            <h4 className="font-medium text-gray-900 dark:text-gray-100">
+                              {meal.title}
+                            </h4>
                             
-                            <div className="flex-1 space-y-2">
-                              {/* Recipe Title */}
-                              <h4 className="font-medium text-gray-900 dark:text-gray-100">
-                                {meal.title}
-                              </h4>
-                              
-                              {/* Date */}
-                              <p className="text-sm text-gray-600 dark:text-gray-400">
-                                {meal.day} • {meal.date}
-                              </p>
-                              
-                              {/* Tags and Ingredients Count */}
-                              <div className="flex gap-2 flex-wrap items-center">
-                                {meal.tags.map((tag, index) => (
-                                  <span key={index} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-2xl">
-                                    {tag}
-                                  </span>
-                                ))}
-                                <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs rounded-2xl flex items-center gap-1">
-                                  <ShoppingCart className="w-3 h-3" />
-                                  {meal.ingredientsCount}/{meal.totalIngredients}
+                            {/* Date */}
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              {meal.day} • {meal.date}
+                            </p>
+                            
+                            {/* Tags and Ingredients Count */}
+                            <div className="flex gap-2 flex-wrap items-center">
+                              {meal.tags.map((tag, index) => (
+                                <span key={index} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-2xl">
+                                  {tag}
                                 </span>
-                              </div>
+                              ))}
+                              <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs rounded-2xl flex items-center gap-1">
+                                <ShoppingCart className="w-3 h-3" />
+                                {meal.ingredientsCount}/{meal.totalIngredients}
+                              </span>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </div>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
                   
                   {/* CTA Button at bottom */}
                   <Button 
                     variant="default" 
-                    className="w-full mt-4"
+                    className="w-full"
                     onClick={() => navigate('/calendar')}
                   >
                     Go To Calendar
@@ -246,29 +244,27 @@ export function Dashboard() {
               {/* Priority List Card */}
               <CarouselItem className="pl-2 md:pl-4 basis-[85%]">
                 <Card className="p-4 h-[520px] flex flex-col">
-                  <div className="flex-1 flex flex-col">
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                      Priority List
-                    </h2>
-                    
-                    {/* Scrollable Priority List */}
-                    <ScrollArea className="flex-1">
-                      <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                        {priorityList.map((item) => (
-                          <PriorityListItem 
-                            key={item.id} 
-                            item={item} 
-                            onToggle={togglePriorityItem}
-                          />
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </div>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                    Priority List
+                  </h2>
+                  
+                  {/* Scrollable Priority List */}
+                  <ScrollArea className="flex-1 mb-4">
+                    <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                      {priorityList.map((item) => (
+                        <PriorityListItem 
+                          key={item.id} 
+                          item={item} 
+                          onToggle={togglePriorityItem}
+                        />
+                      ))}
+                    </div>
+                  </ScrollArea>
                   
                   {/* CTA Button at bottom */}
                   <Button 
                     variant="default" 
-                    className="w-full mt-4"
+                    className="w-full"
                     onClick={() => console.log('Navigate to Priority List')}
                   >
                     Go To Priority List
