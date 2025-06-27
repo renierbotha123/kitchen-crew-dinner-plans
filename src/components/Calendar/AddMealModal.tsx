@@ -22,6 +22,7 @@ export function AddMealModal({ isOpen, onClose, onAddMeal, selectedDate, availab
       onAddMeal(selectedRecipe, selectedDate, selectedMealType);
       setSelectedRecipe(null);
       setSelectedMealType('dinner');
+      onClose();
     }
   };
 
@@ -75,10 +76,10 @@ export function AddMealModal({ isOpen, onClose, onAddMeal, selectedDate, availab
             {availableRecipes.map(recipe => (
               <Card
                 key={recipe.id}
-                className={`p-3 cursor-pointer transition-colors rounded-2xl ${
+                className={`p-3 cursor-pointer transition-all duration-200 rounded-2xl ${
                   selectedRecipe === recipe.id 
-                    ? 'ring-2 ring-primary bg-primary/5' 
-                    : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                    ? 'ring-2 ring-primary bg-primary/5 scale-[1.02]' 
+                    : 'hover:bg-gray-50 dark:hover:bg-gray-700 hover:scale-[1.01]'
                 }`}
                 onClick={() => setSelectedRecipe(recipe.id)}
               >
@@ -109,6 +110,11 @@ export function AddMealModal({ isOpen, onClose, onAddMeal, selectedDate, availab
                       </div>
                     </div>
                   </div>
+                  {selectedRecipe === recipe.id && (
+                    <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                    </div>
+                  )}
                 </div>
               </Card>
             ))}

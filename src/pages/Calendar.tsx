@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -43,6 +42,7 @@ export function Calendar() {
   const [showMealDetail, setShowMealDetail] = useState(false);
   const [showAddMeal, setShowAddMeal] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [nextMealId, setNextMealId] = useState(9); // Start from 9 since we have IDs 1-8
 
   const navigateMonth = (direction: 'prev' | 'next') => {
     const newDate = new Date(currentDate);
@@ -69,6 +69,7 @@ export function Calendar() {
     if (recipe) {
       const newMeal = {
         ...recipe,
+        id: nextMealId, // Assign unique ID
         type: mealType,
         ingredients: ['Sample ingredients'],
         missingIngredients: []
@@ -78,8 +79,10 @@ export function Calendar() {
         ...prev,
         [date]: [...(prev[date] || []), newMeal]
       }));
+      
+      setNextMealId(prev => prev + 1); // Increment for next meal
+      console.log('Meal added:', newMeal, 'to date:', date);
     }
-    setShowAddMeal(false);
   };
 
   const handleRemoveMeal = (mealId: number, date: string) => {
@@ -87,6 +90,7 @@ export function Calendar() {
       ...prev,
       [date]: prev[date]?.filter(meal => meal.id !== mealId) || []
     }));
+    console.log('Meal removed:', mealId, 'from date:', date);
   };
 
   const formatDateHeader = () => {
