@@ -26,12 +26,24 @@ const plannedMeals = {
   ],
 };
 
-// Mock recipes for adding meals
+// Mock recipes for adding meals - expanded list
 const availableRecipes = [
   { id: 5, title: 'Pancakes', cookTime: 15, prepTime: 10, serves: 3, image: '/placeholder.svg' },
   { id: 6, title: 'Caesar Salad', cookTime: 0, prepTime: 15, serves: 2, image: '/placeholder.svg' },
   { id: 7, title: 'Grilled Salmon', cookTime: 20, prepTime: 5, serves: 4, image: '/placeholder.svg' },
   { id: 8, title: 'Vegetable Stir Fry', cookTime: 15, prepTime: 10, serves: 3, image: '/placeholder.svg' },
+  { id: 9, title: 'Chicken Parmesan', cookTime: 30, prepTime: 20, serves: 4, image: '/placeholder.svg' },
+  { id: 10, title: 'Thai Green Curry', cookTime: 25, prepTime: 15, serves: 6, image: '/placeholder.svg' },
+  { id: 11, title: 'Fish and Chips', cookTime: 25, prepTime: 10, serves: 4, image: '/placeholder.svg' },
+  { id: 12, title: 'Mushroom Risotto', cookTime: 35, prepTime: 10, serves: 4, image: '/placeholder.svg' },
+  { id: 13, title: 'BBQ Pulled Pork Sandwich', cookTime: 180, prepTime: 15, serves: 8, image: '/placeholder.svg' },
+  { id: 14, title: 'Mediterranean Quinoa Bowl', cookTime: 0, prepTime: 20, serves: 2, image: '/placeholder.svg' },
+  { id: 15, title: 'Beef Wellington', cookTime: 45, prepTime: 60, serves: 6, image: '/placeholder.svg' },
+  { id: 16, title: 'Homemade Pizza Margherita', cookTime: 12, prepTime: 120, serves: 4, image: '/placeholder.svg' },
+  { id: 17, title: 'Chocolate Lava Cake', cookTime: 12, prepTime: 15, serves: 2, image: '/placeholder.svg' },
+  { id: 18, title: 'Korean Fried Chicken', cookTime: 25, prepTime: 30, serves: 4, image: '/placeholder.svg' },
+  { id: 19, title: 'Lamb Tagine with Apricots', cookTime: 120, prepTime: 20, serves: 6, image: '/placeholder.svg' },
+  { id: 20, title: 'Vietnamese Pho', cookTime: 180, prepTime: 30, serves: 4, image: '/placeholder.svg' },
 ];
 
 export function Calendar() {
