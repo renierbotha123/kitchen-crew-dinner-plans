@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 
@@ -312,7 +312,7 @@ export function RecipeDetail() {
 
       {/* Fixed Bottom Actions - Different layout based on source */}
       {!isFromDashboard && (
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 space-y-3">
+        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4">
           <div className="flex gap-3">
             <Button
               variant="outline"
@@ -336,73 +336,66 @@ export function RecipeDetail() {
               Add to Plan
             </Button>
           </div>
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={handleAddToCart}
-            className="w-full"
-          >
-            <ShoppingCart className="w-4 h-4 mr-2" />
-            Add Ingredients to Cart
-          </Button>
-        </div>
-      )}
-
-      {/* Bottom Navigation Space - only when from dashboard */}
-      {isFromDashboard && (
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 pb-6">
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={handleAddToCart}
-            className="w-full"
-          >
-            <ShoppingCart className="w-4 h-4 mr-2" />
-            Add Ingredients to Cart
-          </Button>
         </div>
       )}
 
       {/* Calendar Modal */}
-      <Dialog open={showCalendarModal} onOpenChange={setShowCalendarModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Schedule Meal</DialogTitle>
-          </DialogHeader>
+      <Sheet open={showCalendarModal} onOpenChange={setShowCalendarModal}>
+        <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl p-0">
+          {/* Drag Indicator */}
+          <div className="flex justify-center pt-3 pb-2">
+            <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
+          </div>
           
-          <div className="space-y-6">
-            {/* Calendar */}
-            <div className="flex justify-center">
-              <CalendarComponent
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-                disabled={(date) => date < new Date()}
-                initialFocus
-                className="rounded-md border"
-              />
+          <SheetHeader className="px-6 pb-4">
+            <div className="flex items-center justify-between">
+              <SheetTitle>Schedule Meal</SheetTitle>
+              <button
+                onClick={() => setShowCalendarModal(false)}
+                className="p-2 -mr-2 rounded-full hover:bg-accent transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
+          </SheetHeader>
+          
+          <div className="flex-1 px-6 pb-24 overflow-y-auto">
+            <div className="space-y-6">
+              {/* Calendar */}
+              <div className="flex justify-center">
+                <CalendarComponent
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={setSelectedDate}
+                  disabled={(date) => date < new Date()}
+                  initialFocus
+                  className="rounded-md border"
+                />
+              </div>
 
-            {/* Meal Type Selector */}
-            <div className="space-y-3">
-              <h3 className="text-sm font-medium text-foreground">Meal Type</h3>
-              <div className="flex gap-2">
-                {mealTypeOptions.map((option) => (
-                  <Button
-                    key={option.value}
-                    variant={selectedMealType === option.value ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedMealType(option.value as 'breakfast' | 'lunch' | 'dinner')}
-                    className="flex-1"
-                  >
-                    {option.label}
-                  </Button>
-                ))}
+              {/* Meal Type Selector */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-medium text-foreground">Meal Type</h3>
+                <div className="flex gap-2">
+                  {mealTypeOptions.map((option) => (
+                    <Button
+                      key={option.value}
+                      variant={selectedMealType === option.value ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedMealType(option.value as 'breakfast' | 'lunch' | 'dinner')}
+                      className="flex-1"
+                    >
+                      {option.label}
+                    </Button>
+                  ))}
+                </div>
               </div>
             </div>
+          </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-3 pt-4">
+          {/* Sticky Bottom Buttons */}
+          <div className="absolute bottom-0 left-0 right-0 bg-background border-t border-border p-4 space-y-3">
+            <div className="flex gap-3">
               <Button
                 variant="outline"
                 onClick={() => setShowCalendarModal(false)}
@@ -418,17 +411,17 @@ export function RecipeDetail() {
                 <ShoppingCart className="w-4 h-4 mr-2" />
                 Add to Cart
               </Button>
-              <Button
-                onClick={handleConfirmAddToCalendar}
-                disabled={!selectedDate}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-              >
-                Schedule
-              </Button>
             </div>
+            <Button
+              onClick={handleConfirmAddToCalendar}
+              disabled={!selectedDate}
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+            >
+              Schedule
+            </Button>
           </div>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
