@@ -1,14 +1,16 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { ArrowLeft, Heart, Calendar, ShoppingCart, Clock, Users, ChefHat, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Card } from '@/components/ui/card';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import { RecipeHeader } from '@/components/Recipe/RecipeHeader';
+import { RecipeCoverImage } from '@/components/Recipe/RecipeCoverImage';
+import { RecipeInfo } from '@/components/Recipe/RecipeInfo';
+import { RecipeIngredients } from '@/components/Recipe/RecipeIngredients';
+import { RecipeMethod } from '@/components/Recipe/RecipeMethod';
+import { RecipeSource } from '@/components/Recipe/RecipeSource';
+import { ScheduleMealModal } from '@/components/Recipe/ScheduleMealModal';
+import { RecipeActions } from '@/components/Recipe/RecipeActions';
 
 // Mock recipe data - in a real app, this would come from props, API, or context
 const mockRecipe = {
@@ -52,58 +54,6 @@ const mockRecipe = {
 
 Pro tip: For extra flavor, brush chicken with additional Caesar dressing while grilling.`
 };
-
-interface IngredientItemProps {
-  ingredient: string;
-  index: number;
-  isChecked: boolean;
-  onToggle: (index: number) => void;
-}
-
-// Ingredient Item Component
-function IngredientItem({ ingredient, index, isChecked, onToggle }: IngredientItemProps) {
-  return (
-    <div className="flex items-start space-x-3 py-2">
-      <Checkbox
-        id={`ingredient-${index}`}
-        checked={isChecked}
-        onCheckedChange={() => onToggle(index)}
-        className="mt-1"
-      />
-      <label
-        htmlFor={`ingredient-${index}`}
-        className={`text-sm leading-relaxed cursor-pointer ${
-          isChecked ? 'line-through text-muted-foreground' : 'text-foreground'
-        }`}
-      >
-        {ingredient}
-      </label>
-    </div>
-  );
-}
-
-// Source Link Component
-interface SourceLinkProps {
-  source: string;
-  sourceUrl?: string;
-}
-
-function SourceLink({ source, sourceUrl }: SourceLinkProps) {
-  if (sourceUrl) {
-    return (
-      <a
-        href={sourceUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-primary hover:text-primary/80 underline text-sm"
-      >
-        {source}
-      </a>
-    );
-  }
-  
-  return <span className="text-muted-foreground text-sm">{source}</span>;
-}
 
 export function RecipeDetail() {
   const navigate = useNavigate();
@@ -189,239 +139,58 @@ export function RecipeDetail() {
     });
   };
 
-  const mealTypeOptions = [
-    { value: 'breakfast', label: 'Breakfast' },
-    { value: 'lunch', label: 'Lunch' },
-    { value: 'dinner', label: 'Dinner' }
-  ];
-
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 bg-background/95 backdrop-blur-sm border-b border-border z-40">
-        <div className="flex items-center px-4 py-4">
-          <button
-            onClick={handleBack}
-            className="p-2 -ml-2 rounded-full hover:bg-accent transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <h1 className="ml-2 text-lg font-semibold text-foreground truncate">
-            Recipe
-          </h1>
-        </div>
-      </div>
+      <RecipeHeader onBack={handleBack} />
 
       <div className={isFromDashboard ? "pb-32" : "pb-6"}>
-        {/* Cover Image */}
-        <div className="relative w-full h-64 sm:h-80 overflow-hidden">
-          <img
-            src={recipe.image}
-            alt={recipe.title}
-            className="w-full h-full object-cover"
-          />
-          
-          {/* Favorite Heart - only show if from dashboard */}
-          {isFromDashboard && (
-            <button
-              onClick={handleToggleFavorite}
-              className="absolute top-4 right-4 p-2 rounded-full bg-black/50 hover:bg-black/70 transition-colors"
-            >
-              <Heart 
-                className={`w-5 h-5 ${
-                  isFavorited 
-                    ? 'text-red-500 fill-current' 
-                    : 'text-white'
-                }`}
-              />
-            </button>
-          )}
-        </div>
+        <RecipeCoverImage
+          image={recipe.image}
+          title={recipe.title}
+          isFromDashboard={isFromDashboard}
+          isFavorited={isFavorited}
+          onToggleFavorite={handleToggleFavorite}
+        />
 
         {/* Content */}
         <div className="px-4 py-6 space-y-6">
-          {/* Main Info Section */}
-          <div className="space-y-4">
-            <h1 className="text-2xl font-bold text-foreground leading-tight">
-              {recipe.title}
-            </h1>
+          <RecipeInfo
+            title={recipe.title}
+            tags={recipe.tags}
+            prepTime={recipe.prepTime}
+            cookTime={recipe.cookTime}
+            serves={recipe.serves}
+          />
 
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2">
-              {recipe.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="text-xs">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
+          <RecipeIngredients
+            ingredients={recipe.ingredients}
+            checkedIngredients={checkedIngredients}
+            onIngredientToggle={handleIngredientToggle}
+          />
 
-            {/* Recipe Stats */}
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <ChefHat className="w-4 h-4" />
-                <span>{recipe.prepTime}m prep</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                <span>{recipe.cookTime}m cook</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Users className="w-4 h-4" />
-                <span>Serves {recipe.serves}</span>
-              </div>
-            </div>
-          </div>
+          <RecipeMethod method={recipe.method} />
 
-          {/* Ingredients Section */}
-          <Card className="p-4">
-            <h2 className="text-lg font-semibold text-foreground mb-4">
-              Ingredients
-            </h2>
-            <div className="space-y-1">
-              {recipe.ingredients.map((ingredient, index) => (
-                <IngredientItem
-                  key={index}
-                  ingredient={ingredient}
-                  index={index}
-                  isChecked={checkedIngredients[index]}
-                  onToggle={handleIngredientToggle}
-                />
-              ))}
-            </div>
-          </Card>
-
-          {/* Method Section */}
-          <Card className="p-4">
-            <h2 className="text-lg font-semibold text-foreground mb-4">
-              Method
-            </h2>
-            <div className="prose prose-sm max-w-none">
-              <p className="text-foreground leading-relaxed whitespace-pre-line">
-                {recipe.method}
-              </p>
-            </div>
-          </Card>
-
-          {/* Source Section */}
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Source:</span>
-            <SourceLink source={recipe.source} sourceUrl={recipe.sourceUrl} />
-          </div>
+          <RecipeSource source={recipe.source} sourceUrl={recipe.sourceUrl} />
         </div>
       </div>
 
-      {/* Fixed Bottom Actions - Different layout based on source */}
-      {!isFromDashboard && (
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4">
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={handleToggleFavorite}
-              className="flex-1"
-            >
-              <Heart
-                className={`w-4 h-4 mr-2 ${
-                  isFavorited ? 'fill-current text-red-500' : ''
-                }`}
-              />
-              {isFavorited ? 'Favorited' : 'Favorite'}
-            </Button>
-            <Button
-              size="lg"
-              onClick={handleAddToCalendar}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-            >
-              <Calendar className="w-4 h-4 mr-2" />
-              Add to Plan
-            </Button>
-          </div>
-        </div>
-      )}
+      <RecipeActions
+        isFromDashboard={isFromDashboard}
+        isFavorited={isFavorited}
+        onToggleFavorite={handleToggleFavorite}
+        onAddToCalendar={handleAddToCalendar}
+      />
 
-      {/* Calendar Modal */}
-      <Sheet open={showCalendarModal} onOpenChange={setShowCalendarModal}>
-        <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl p-0">
-          {/* Drag Indicator */}
-          <div className="flex justify-center pt-3 pb-2">
-            <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
-          </div>
-          
-          <SheetHeader className="px-6 pb-4">
-            <div className="flex items-center justify-between">
-              <SheetTitle>Schedule Meal</SheetTitle>
-              <button
-                onClick={() => setShowCalendarModal(false)}
-                className="p-2 -mr-2 rounded-full hover:bg-accent transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-          </SheetHeader>
-          
-          <div className="flex-1 px-6 pb-24 overflow-y-auto">
-            <div className="space-y-6">
-              {/* Calendar */}
-              <div className="flex justify-center">
-                <CalendarComponent
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  disabled={(date) => date < new Date()}
-                  initialFocus
-                  className="rounded-md border"
-                />
-              </div>
-
-              {/* Meal Type Selector */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-foreground">Meal Type</h3>
-                <div className="flex gap-2">
-                  {mealTypeOptions.map((option) => (
-                    <Button
-                      key={option.value}
-                      variant={selectedMealType === option.value ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setSelectedMealType(option.value as 'breakfast' | 'lunch' | 'dinner')}
-                      className="flex-1"
-                    >
-                      {option.label}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Sticky Bottom Buttons */}
-          <div className="absolute bottom-0 left-0 right-0 bg-background border-t border-border p-4 space-y-3">
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={() => setShowCalendarModal(false)}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleAddToCart}
-                variant="outline"
-                className="flex-1"
-              >
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                Add to Cart
-              </Button>
-            </div>
-            <Button
-              onClick={handleConfirmAddToCalendar}
-              disabled={!selectedDate}
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
-            >
-              Schedule
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
+      <ScheduleMealModal
+        isOpen={showCalendarModal}
+        onClose={() => setShowCalendarModal(false)}
+        selectedDate={selectedDate}
+        onSelectDate={setSelectedDate}
+        selectedMealType={selectedMealType}
+        onSelectMealType={setSelectedMealType}
+        onAddToCart={handleAddToCart}
+        onSchedule={handleConfirmAddToCalendar}
+      />
     </div>
   );
 }
