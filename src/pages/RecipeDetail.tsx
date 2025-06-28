@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ArrowLeft, Heart, Calendar, ShoppingCart, Clock, Users, ChefHat } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -106,7 +106,11 @@ function SourceLink({ source, sourceUrl }: SourceLinkProps) {
 export function RecipeDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const location = useLocation();
   const { toast } = useToast();
+  
+  // Check if user came from dashboard (upcoming meal card)
+  const isFromDashboard = location.state?.fromDashboard || false;
   
   // State management
   const [recipe] = useState(mockRecipe);
@@ -114,6 +118,21 @@ export function RecipeDetail() {
   const [checkedIngredients, setCheckedIngredients] = useState<boolean[]>(
     new Array(recipe.ingredients.length).fill(false)
   );
+
+  // Hide bottom navigation when component mounts, show it when unmounting
+  useEffect(() => {
+    const bottomNav = document.querySelector('nav[class*="fixed bottom-0"]') as HTMLElement;
+    if (bottomNav && !isFromDashboard) {
+      bottomNav.style.display = 'none';
+    }
+
+    // Cleanup: show navigation when leaving the page
+    return () => {
+      if (bottomNav && !isFromDashboard) {
+        bottomNav.style.display = 'flex';
+      }
+    };
+  }, [isFromDashboard]);
 
   // Handlers
   const handleBack = () => {
@@ -173,14 +192,30 @@ export function RecipeDetail() {
         </div>
       </div>
 
-      <div className="pb-32">
+      <div className={isFromDashboard ? "pb-32" : "pb-6"}>
         {/* Cover Image */}
-        <div className="w-full h-64 sm:h-80 overflow-hidden">
+        <div className="relative w-full h-64 sm:h-80 overflow-hidden">
           <img
             src={recipe.image}
             alt={recipe.title}
             className="w-full h-full object-cover"
           />
+          
+          {/* Favorite Heart - only show if from dashboard */}
+          {isFromDashboard && (
+            <button
+              onClick={handleToggleFavorite}
+              className="absolute top-4 right-4 p-2 rounded-full bg-black/50 hover:bg-black/70 transition-colors"
+            >
+              <Heart 
+                className={`w-5 h-5 ${
+                  isFavorited 
+                    ? 'text-red-500 fill-current' 
+                    : 'text-white'
+                }`}
+              />
+            </button>
+          )}
         </div>
 
         {/* Content */}
@@ -255,41 +290,57 @@ export function RecipeDetail() {
         </div>
       </div>
 
-      {/* Fixed Bottom Actions */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 pb-6 space-y-3">
-        <div className="flex gap-3">
+      {/* Fixed Bottom Actions - Different layout based on source */}
+      {!isFromDashboard && (
+        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 space-y-3">
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={handleToggleFavorite}
+              className="flex-1"
+            >
+              <Heart
+                className={`w-4 h-4 mr-2 ${
+                  isFavorited ? 'fill-current text-red-500' : ''
+                }`}
+              />
+              {isFavorited ? 'Favorited' : 'Favorite'}
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={handleAddToCalendar}
+              className="flex-1"
+            >
+              <Calendar className="w-4 h-4 mr-2" />
+              Add to Plan
+            </Button>
+          </div>
           <Button
-            variant="outline"
             size="lg"
-            onClick={handleToggleFavorite}
-            className="flex-1"
+            onClick={handleAddToCart}
+            className="w-full"
           >
-            <Heart
-              className={`w-4 h-4 mr-2 ${
-                isFavorited ? 'fill-current text-red-500' : ''
-              }`}
-            />
-            {isFavorited ? 'Favorited' : 'Favorite'}
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={handleAddToCalendar}
-            className="flex-1"
-          >
-            <Calendar className="w-4 h-4 mr-2" />
-            Add to Plan
+            <ShoppingCart className="w-4 h-4 mr-2" />
+            Add Ingredients to Cart
           </Button>
         </div>
-        <Button
-          size="lg"
-          onClick={handleAddToCart}
-          className="w-full"
-        >
-          <ShoppingCart className="w-4 h-4 mr-2" />
-          Add Ingredients to Cart
-        </Button>
-      </div>
+      )}
+
+      {/* Bottom Navigation Space - only when from dashboard */}
+      {isFromDashboard && (
+        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 pb-6">
+          <Button
+            size="lg"
+            onClick={handleAddToCart}
+            className="w-full"
+          >
+            <ShoppingCart className="w-4 h-4 mr-2" />
+            Add Ingredients to Cart
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

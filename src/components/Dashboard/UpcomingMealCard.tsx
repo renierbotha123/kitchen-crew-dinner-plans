@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Clock, Users } from 'lucide-react';
@@ -15,10 +16,21 @@ interface UpcomingMealCardProps {
     cookTime: string;
     serves: number;
   };
-  onGoToRecipe: () => void;
+  onGoToRecipe?: () => void;
 }
 
 export function UpcomingMealCard({ meal, onGoToRecipe }: UpcomingMealCardProps) {
+  const navigate = useNavigate();
+
+  const handleGoToRecipe = () => {
+    if (onGoToRecipe) {
+      onGoToRecipe();
+    } else {
+      // Navigate to recipe detail with fromDashboard state
+      navigate(`/recipes/${meal.id}`, { state: { fromDashboard: true } });
+    }
+  };
+
   return (
     <Card className="w-full p-4">
       <div className="space-y-4">
@@ -63,7 +75,7 @@ export function UpcomingMealCard({ meal, onGoToRecipe }: UpcomingMealCardProps) 
         </div>
         
         {/* CTA Button */}
-        <Button onClick={onGoToRecipe} className="w-full">
+        <Button onClick={handleGoToRecipe} className="w-full">
           Go To Recipe
         </Button>
       </div>
