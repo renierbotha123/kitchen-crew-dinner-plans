@@ -44,42 +44,26 @@ export function SlideUpMenu({ isOpen, onClose }: SlideUpMenuProps) {
         onClick={onClose}
       />
       
-      {/* Menu Content */}
-      <div className={`fixed bg-white dark:bg-gray-800 rounded-t-3xl overflow-hidden transform transition-all duration-300 ease-out bottom-0 left-0 right-0 ${
-        isOpen ? 'translate-y-0' : 'translate-y-full'
+      {/* Extended Nav Tray */}
+      <div className={`fixed left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 transition-all duration-300 ease-out ${
+        isOpen ? 'bottom-0 translate-y-0' : 'bottom-0 translate-y-full'
       }`}>
-        {/* Drag Indicator */}
-        <div className="flex justify-center pt-4 pb-2">
-          <div 
-            className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full cursor-pointer hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors" 
-            onClick={onClose}
-          />
-        </div>
-        
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 font-[Jost]">Menu</h2>
-        </div>
-        
-        {/* Menu Items Grid */}
-        <div className="px-6 py-6 pb-safe">
-          <div className="grid grid-cols-4 gap-6">
+        {/* Menu Items - same styling as nav tray */}
+        <div className="px-4 py-4 pb-safe">
+          <div className="flex justify-around items-center max-w-md mx-auto">
             {menuItems.map(({ id, icon: Icon, label, path }) => (
               <button
                 key={id}
                 onClick={() => handleItemClick(path)}
-                className="flex flex-col items-center justify-center p-4 rounded-2xl bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 min-h-[88px]"
+                className="flex flex-col items-center justify-center flex-1 py-2 px-1 rounded-xl transition-all duration-200 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:scale-105 hover:bg-gray-50 dark:hover:bg-gray-700/50"
               >
-                <Icon className="w-6 h-6 text-gray-600 dark:text-gray-400 mb-2" />
-                <span className="text-sm font-medium text-gray-900 dark:text-gray-100 font-[Jost] text-center leading-tight">
+                <Icon className="w-5 h-5 transition-transform duration-200" />
+                <span className="text-xs font-medium mt-1 transition-colors duration-200 text-gray-500 dark:text-gray-400">
                   {label}
                 </span>
               </button>
             ))}
           </div>
-          
-          {/* Additional spacing for safe area */}
-          <div className="h-4" />
         </div>
       </div>
     </div>
