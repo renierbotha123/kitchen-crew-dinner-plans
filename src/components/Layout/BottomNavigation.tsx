@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { Home, Calendar, BookOpen, ShoppingCart, Menu } from 'lucide-react';
 import { SlideUpMenu } from './SlideUpMenu';
 
@@ -13,10 +13,14 @@ const navItems = [
 
 export function BottomNavigation() {
   const [showMenu, setShowMenu] = useState(false);
+  const location = useLocation();
 
   const handleMenuToggle = () => {
     setShowMenu(!showMenu);
   };
+
+  // Check if current route is a menu route (profile, notes, help, settings)
+  const isMenuRouteActive = ['/profile', '/notes', '/help', '/settings'].includes(location.pathname);
 
   return (
     <>
@@ -56,10 +60,18 @@ export function BottomNavigation() {
           {/* Menu Tab */}
           <button
             onClick={handleMenuToggle}
-            className="flex flex-col items-center justify-center flex-1 py-2 px-1 rounded-xl transition-all duration-200 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+            className={`flex flex-col items-center justify-center flex-1 py-2 px-1 rounded-xl transition-all duration-200 ${
+              isMenuRouteActive || showMenu
+                ? 'text-primary scale-105 bg-primary/10'
+                : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
+            }`}
           >
-            <Menu className="w-5 h-5 transition-transform duration-200" />
-            <span className="text-xs font-medium mt-1 transition-colors duration-200 text-gray-500 dark:text-gray-400">
+            <Menu className={`w-5 h-5 transition-transform duration-200 ${
+              isMenuRouteActive || showMenu ? 'scale-110' : ''
+            }`} />
+            <span className={`text-xs font-medium mt-1 transition-colors duration-200 ${
+              isMenuRouteActive || showMenu ? 'text-primary' : 'text-gray-500 dark:text-gray-400'
+            }`}>
               Menu
             </span>
           </button>
