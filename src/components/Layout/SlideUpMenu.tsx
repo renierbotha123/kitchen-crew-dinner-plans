@@ -38,9 +38,9 @@ export function SlideUpMenu({ isOpen, onClose }: SlideUpMenuProps) {
 
   return (
     <div className="fixed inset-0 z-[60]">
-      {/* Overlay */}
+      {/* Overlay - excludes bottom navigation area */}
       <div 
-        className="fixed inset-0 bg-black/50 transition-opacity duration-300"
+        className="fixed inset-0 bottom-16 bg-black/50 transition-opacity duration-300"
         onClick={onClose}
       />
       
