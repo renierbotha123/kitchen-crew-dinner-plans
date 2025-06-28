@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Home, Users, QrCode } from 'lucide-react';
@@ -26,31 +25,49 @@ export function HouseholdSetup() {
       return;
     }
 
+    if (!user?.id) {
+      setError('You must be logged in to create a household');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
     try {
-      // Create household
+      console.log('Creating household with user ID:', user.id);
+      
+      // Create household - the RLS policy allows any authenticated user to insert
       const { data: household, error: householdError } = await supabase
         .from('households')
         .insert([{ name: householdName.trim() }])
         .select()
         .single();
 
-      if (householdError) throw householdError;
+      if (householdError) {
+        console.error('Household creation error:', householdError);
+        throw householdError;
+      }
+
+      console.log('Created household:', household);
 
       // Update user profile with household_id
       const { error: profileError } = await supabase
         .from('profiles')
         .update({ household_id: household.id })
-        .eq('id', user?.id);
+        .eq('id', user.id);
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile update error:', profileError);
+        throw profileError;
+      }
+
+      console.log('Profile updated with household_id:', household.id);
 
       // Refresh profile and navigate to dashboard
       await refreshProfile();
       navigate('/');
     } catch (error: any) {
+      console.error('Full error details:', error);
       setError(error.message || 'Failed to create household');
     } finally {
       setLoading(false);
@@ -63,10 +80,17 @@ export function HouseholdSetup() {
       return;
     }
 
+    if (!user?.id) {
+      setError('You must be logged in to join a household');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
     try {
+      console.log('Joining household with invite code:', inviteCode.trim());
+      
       // Find household by invite code
       const { data: household, error: householdError } = await supabase
         .from('households')
@@ -75,21 +99,30 @@ export function HouseholdSetup() {
         .single();
 
       if (householdError || !household) {
+        console.error('Household lookup error:', householdError);
         throw new Error('Invalid invite code');
       }
+
+      console.log('Found household:', household);
 
       // Update user profile with household_id
       const { error: profileError } = await supabase
         .from('profiles')
         .update({ household_id: household.id })
-        .eq('id', user?.id);
+        .eq('id', user.id);
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile update error:', profileError);
+        throw profileError;
+      }
+
+      console.log('Profile updated with household_id:', household.id);
 
       // Refresh profile and navigate to dashboard
       await refreshProfile();
       navigate('/');
     } catch (error: any) {
+      console.error('Full error details:', error);
       setError(error.message || 'Failed to join household');
     } finally {
       setLoading(false);
