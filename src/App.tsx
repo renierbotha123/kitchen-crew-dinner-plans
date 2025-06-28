@@ -10,6 +10,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { Calendar } from "./pages/Calendar";
 import { Cart } from "./pages/Cart";
 import { Profile } from "./pages/Profile";
+import { Recipes } from "./pages/Recipes";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -29,7 +30,7 @@ const App = () => (
               
               {/* Main App Routes */}
               <Route path="/calendar" element={<Calendar />} />
-              <Route path="/recipes" element={<Index />} />
+              <Route path="/recipes" element={<Recipes />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/profile" element={<Profile />} />
               
