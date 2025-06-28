@@ -13,8 +13,8 @@ const navItems = [
 
 export function BottomNavigation() {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-2 pb-safe z-50">
-      <div className="flex justify-around items-center h-16">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-2 z-50 safe-area-inset-bottom">
+      <div className="flex justify-around items-center h-14 max-w-md mx-auto">
         {navItems.map(({ path, icon: Icon, label }) => (
           <NavLink
             key={path}
@@ -22,7 +22,7 @@ export function BottomNavigation() {
             className={({ isActive }) =>
               `flex flex-col items-center justify-center flex-1 py-2 px-1 rounded-xl transition-all duration-200 ${
                 isActive
-                  ? 'text-primary scale-110 bg-primary/10'
+                  ? 'text-primary scale-105 bg-primary/10'
                   : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
               }`
             }
@@ -30,7 +30,7 @@ export function BottomNavigation() {
             {({ isActive }) => (
               <>
                 <Icon
-                  className={`w-6 h-6 transition-transform duration-200 ${
+                  className={`w-5 h-5 transition-transform duration-200 ${
                     isActive ? 'scale-110' : ''
                   }`}
                 />
