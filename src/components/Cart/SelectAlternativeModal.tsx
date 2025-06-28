@@ -1,6 +1,8 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Search } from 'lucide-react';
 import { AlternativeItemCard } from './AlternativeItemCard';
 import { FullScreenModal } from '../UI/FullScreenModal';
@@ -140,84 +142,86 @@ export function SelectAlternativeModal({
       title="Alternative Selection"
       stickyFooter={stickyFooter}
     >
-      <div className="px-4 py-6 space-y-6">
-        {/* Current Item Being Replaced */}
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2 font-[Jost]">
-            Replacing:
-          </h3>
-          <div className="flex items-center space-x-3">
-            <img 
-              src={selectedItem.item.image} 
-              alt={selectedItem.item.name}
-              className="w-12 h-12 object-cover rounded-xl"
-            />
-            <div>
-              <p className="font-medium text-gray-900 dark:text-gray-100 font-[Jost]">
-                {selectedItem.item.name}
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                R{selectedItem.item.price.toFixed(2)} • {selectedItem.item.unit}
-              </p>
+      <ScrollArea className="h-full">
+        <div className="px-4 py-6 space-y-6">
+          {/* Current Item Being Replaced */}
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2 font-[Jost]">
+              Replacing:
+            </h3>
+            <div className="flex items-center space-x-3">
+              <img 
+                src={selectedItem.item.image} 
+                alt={selectedItem.item.name}
+                className="w-12 h-12 object-cover rounded-xl"
+              />
+              <div>
+                <p className="font-medium text-gray-900 dark:text-gray-100 font-[Jost]">
+                  {selectedItem.item.name}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  R{selectedItem.item.price.toFixed(2)} • {selectedItem.item.unit}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Search Bar */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <Input
-            placeholder="Search alternatives..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 rounded-2xl border-gray-200 dark:border-gray-700"
-          />
-        </div>
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Search alternatives..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 rounded-2xl border-gray-200 dark:border-gray-700"
+            />
+          </div>
 
-        {/* Alternatives Carousel */}
-        <div>
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 font-[Jost]">
-            Suggested Alternatives
-          </h3>
-          <div className="horizontal-scroll flex space-x-4 overflow-x-auto pb-4">
-            {filteredAlternatives.map((alternative) => (
-              <AlternativeItemCard
-                key={alternative.id}
-                item={alternative}
-                storeLogo={storeLogos[alternative.store]}
-                isSelected={selectedAlternatives.some(item => item.id === alternative.id)}
-                onSelect={() => handleSelectAlternative(alternative)}
-              />
-            ))}
+          {/* Alternatives Carousel */}
+          <div>
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 font-[Jost]">
+              Suggested Alternatives
+            </h3>
+            <div className="horizontal-scroll flex space-x-4 overflow-x-auto pb-4">
+              {filteredAlternatives.map((alternative) => (
+                <AlternativeItemCard
+                  key={alternative.id}
+                  item={alternative}
+                  storeLogo={storeLogos[alternative.store]}
+                  isSelected={selectedAlternatives.some(item => item.id === alternative.id)}
+                  onSelect={() => handleSelectAlternative(alternative)}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Selection Info */}
+          {selectedAlternatives.length > 0 && (
+            <div className="bg-primary/10 rounded-2xl p-4">
+              <p className="text-sm text-primary font-medium">
+                {selectedAlternatives.length} alternative{selectedAlternatives.length > 1 ? 's' : ''} selected
+              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                Multiple selections will be used as backup options
+              </p>
+            </div>
+          )}
+
+          {/* No Alternative Option */}
+          <div className="text-center py-4">
+            <Button
+              variant="ghost"
+              onClick={handleNoAlternative}
+              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 underline"
+            >
+              "I do not want an alternative"
+            </Button>
+            <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+              (advice for shoppers)
+            </p>
           </div>
         </div>
-
-        {/* Selection Info */}
-        {selectedAlternatives.length > 0 && (
-          <div className="bg-primary/10 rounded-2xl p-4">
-            <p className="text-sm text-primary font-medium">
-              {selectedAlternatives.length} alternative{selectedAlternatives.length > 1 ? 's' : ''} selected
-            </p>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-              Multiple selections will be used as backup options
-            </p>
-          </div>
-        )}
-
-        {/* No Alternative Option */}
-        <div className="text-center py-4">
-          <Button
-            variant="ghost"
-            onClick={handleNoAlternative}
-            className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 underline"
-          >
-            "I do not want an alternative"
-          </Button>
-          <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-            (advice for shoppers)
-          </p>
-        </div>
-      </div>
+      </ScrollArea>
     </FullScreenModal>
   );
 }
