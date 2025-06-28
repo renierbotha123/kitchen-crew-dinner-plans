@@ -1,6 +1,5 @@
 
-import React, { useState } from 'react';
-import { SlideUpModal } from '@/components/UI/SlideUpModal';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ArrowLeft, Search } from 'lucide-react';
@@ -81,6 +80,31 @@ export function SelectAlternativeModal({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAlternatives, setSelectedAlternatives] = useState<any[]>([]);
 
+  // Hide bottom navigation when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      const bottomNav = document.querySelector('nav[class*="fixed bottom-0"]');
+      if (bottomNav) {
+        (bottomNav as HTMLElement).style.display = 'none';
+      }
+    } else {
+      document.body.style.overflow = 'unset';
+      const bottomNav = document.querySelector('nav[class*="fixed bottom-0"]');
+      if (bottomNav) {
+        (bottomNav as HTMLElement).style.display = 'flex';
+      }
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+      const bottomNav = document.querySelector('nav[class*="fixed bottom-0"]');
+      if (bottomNav) {
+        (bottomNav as HTMLElement).style.display = 'flex';
+      }
+    };
+  }, [isOpen]);
+
   const handleSelectAlternative = (alternative: any) => {
     setSelectedAlternatives(prev => {
       const isAlreadySelected = prev.find(item => item.id === alternative.id);
@@ -109,96 +133,116 @@ export function SelectAlternativeModal({
 
   if (!selectedItem) return null;
 
+  if (!isOpen) return null;
+
   return (
-    <SlideUpModal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Alternative Selection"
-    >
-      <div className="space-y-6">
-        {/* Current Item Being Replaced */}
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2 font-[Jost]">
-            Replacing:
-          </h3>
-          <div className="flex items-center space-x-3">
-            <img 
-              src={selectedItem.item.image} 
-              alt={selectedItem.item.name}
-              className="w-12 h-12 object-cover rounded-xl"
-            />
-            <div>
-              <p className="font-medium text-gray-900 dark:text-gray-100 font-[Jost]">
-                {selectedItem.item.name}
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                R{selectedItem.item.price.toFixed(2)} • {selectedItem.item.unit}
-              </p>
+    <div className="fixed inset-0 z-50 bg-white dark:bg-gray-900">
+      {/* Header with back arrow */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-6 pt-12">
+        <div className="flex items-center space-x-3">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="p-2"
+            onClick={onClose}
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 font-[Jost]">
+            Alternative Selection
+          </h1>
+        </div>
+      </div>
+
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto pb-32">
+        <div className="px-4 py-6 space-y-6">
+          {/* Current Item Being Replaced */}
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2 font-[Jost]">
+              Replacing:
+            </h3>
+            <div className="flex items-center space-x-3">
+              <img 
+                src={selectedItem.item.image} 
+                alt={selectedItem.item.name}
+                className="w-12 h-12 object-cover rounded-xl"
+              />
+              <div>
+                <p className="font-medium text-gray-900 dark:text-gray-100 font-[Jost]">
+                  {selectedItem.item.name}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  R{selectedItem.item.price.toFixed(2)} • {selectedItem.item.unit}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Search Bar */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <Input
-            placeholder="Search alternatives..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 rounded-2xl border-gray-200 dark:border-gray-700"
-          />
-        </div>
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Search alternatives..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 rounded-2xl border-gray-200 dark:border-gray-700"
+            />
+          </div>
 
-        {/* Alternatives Carousel */}
-        <div>
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 font-[Jost]">
-            Suggested Alternatives
-          </h3>
-          <div className="horizontal-scroll flex space-x-4 overflow-x-auto pb-4">
-            {filteredAlternatives.map((alternative) => (
-              <AlternativeItemCard
-                key={alternative.id}
-                item={alternative}
-                storeLogo={storeLogos[alternative.store]}
-                isSelected={selectedAlternatives.some(item => item.id === alternative.id)}
-                onSelect={() => handleSelectAlternative(alternative)}
-              />
-            ))}
+          {/* Alternatives Carousel */}
+          <div>
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 font-[Jost]">
+              Suggested Alternatives
+            </h3>
+            <div className="horizontal-scroll flex space-x-4 overflow-x-auto pb-4">
+              {filteredAlternatives.map((alternative) => (
+                <AlternativeItemCard
+                  key={alternative.id}
+                  item={alternative}
+                  storeLogo={storeLogos[alternative.store]}
+                  isSelected={selectedAlternatives.some(item => item.id === alternative.id)}
+                  onSelect={() => handleSelectAlternative(alternative)}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Selection Info */}
+          {selectedAlternatives.length > 0 && (
+            <div className="bg-primary/10 rounded-2xl p-4">
+              <p className="text-sm text-primary font-medium">
+                {selectedAlternatives.length} alternative{selectedAlternatives.length > 1 ? 's' : ''} selected
+              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                Multiple selections will be used as backup options
+              </p>
+            </div>
+          )}
+
+          {/* No Alternative Option */}
+          <div className="text-center py-4">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              "I do not want an alternative"
+              <br />
+              <span className="text-xs">(advice for shoppers)</span>
+            </p>
           </div>
         </div>
+      </div>
 
-        {/* Selection Info */}
-        {selectedAlternatives.length > 0 && (
-          <div className="bg-primary/10 rounded-2xl p-4">
-            <p className="text-sm text-primary font-medium">
-              {selectedAlternatives.length} alternative{selectedAlternatives.length > 1 ? 's' : ''} selected
-            </p>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-              Multiple selections will be used as backup options
-            </p>
-          </div>
-        )}
-
-        {/* No Alternative Option */}
-        <div className="text-center py-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            "I do not want an alternative"
-            <br />
-            <span className="text-xs">(advice for shoppers)</span>
-          </p>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex space-x-3 pt-4">
+      {/* Sticky CTAs at bottom */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-4 pb-safe">
+        <div className="flex space-x-3">
           <Button
             variant="secondary"
-            className="flex-1 rounded-2xl"
+            className="flex-1 rounded-2xl h-12"
             onClick={handleChooseForMe}
           >
             Choose for me
           </Button>
           <Button
-            className="flex-1 rounded-2xl"
+            className="flex-1 rounded-2xl h-12"
             onClick={handleConfirmSelection}
             disabled={selectedAlternatives.length === 0}
           >
@@ -206,6 +250,6 @@ export function SelectAlternativeModal({
           </Button>
         </div>
       </div>
-    </SlideUpModal>
+    </div>
   );
 }
