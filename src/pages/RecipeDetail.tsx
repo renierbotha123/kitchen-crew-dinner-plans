@@ -1,8 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import { useMealPlan } from '@/contexts/MealPlanContext';
 import { RecipeHeader } from '@/components/Recipe/RecipeHeader';
 import { RecipeCoverImage } from '@/components/Recipe/RecipeCoverImage';
 import { RecipeInfo } from '@/components/Recipe/RecipeInfo';
@@ -60,6 +60,7 @@ export function RecipeDetail() {
   const { id } = useParams();
   const location = useLocation();
   const { toast } = useToast();
+  const { addMeal } = useMealPlan();
   
   // Check if user came from dashboard (upcoming meal card)
   const isFromDashboard = location.state?.fromDashboard || false;
@@ -110,6 +111,22 @@ export function RecipeDetail() {
 
   const handleConfirmAddToCalendar = () => {
     if (selectedDate) {
+      // Create meal object from recipe
+      const mealToAdd = {
+        id: 0, // Will be assigned by context
+        title: recipe.title,
+        type: selectedMealType,
+        cookTime: recipe.cookTime,
+        prepTime: recipe.prepTime,
+        serves: recipe.serves,
+        image: recipe.image,
+        ingredients: recipe.ingredients,
+        missingIngredients: []
+      };
+
+      // Add to meal plan
+      addMeal(selectedDate.toISOString().split('T')[0], mealToAdd);
+
       toast({
         title: "Added to meal plan",
         description: `Recipe scheduled for ${format(selectedDate, 'PPP')} - ${selectedMealType}`,

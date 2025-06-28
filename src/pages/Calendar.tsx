@@ -2,29 +2,12 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useMealPlan } from '@/contexts/MealPlanContext';
 import { CalendarGrid } from '@/components/Calendar/CalendarGrid';
 import { WeekView } from '@/components/Calendar/WeekView';
 import { MealDetailModal } from '@/components/Calendar/MealDetailModal';
 import { AddMealModal } from '@/components/Calendar/AddMealModal';
 import { FloatingActionButton } from '@/components/UI/FloatingActionButton';
-
-// Mock data for planned meals
-const plannedMeals = {
-  '2024-01-15': [
-    { id: 1, title: 'Spaghetti Carbonara', type: 'dinner', cookTime: 25, prepTime: 15, serves: 4, 
-      image: '/placeholder.svg', ingredients: ['Pasta', 'Eggs', 'Bacon', 'Parmesan'], missingIngredients: [] },
-  ],
-  '2024-01-16': [
-    { id: 2, title: 'Greek Salad', type: 'lunch', cookTime: 0, prepTime: 10, serves: 2,
-      image: '/placeholder.svg', ingredients: ['Tomatoes', 'Cucumber', 'Feta', 'Olives'], missingIngredients: ['Feta'] },
-    { id: 3, title: 'Beef Tacos', type: 'dinner', cookTime: 20, prepTime: 10, serves: 4,
-      image: '/placeholder.svg', ingredients: ['Ground Beef', 'Tortillas', 'Lettuce', 'Cheese'], missingIngredients: [] }
-  ],
-  '2024-01-17': [
-    { id: 4, title: 'Chicken Curry', type: 'dinner', cookTime: 35, prepTime: 15, serves: 6,
-      image: '/placeholder.svg', ingredients: ['Chicken', 'Curry Powder', 'Coconut Milk', 'Rice'], missingIngredients: ['Curry Powder'] }
-  ],
-};
 
 // Mock recipes for adding meals - expanded list
 const availableRecipes = [
@@ -49,12 +32,11 @@ const availableRecipes = [
 export function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
-  const [meals, setMeals] = useState(plannedMeals);
+  const { meals, addMeal, removeMeal } = useMealPlan();
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [showMealDetail, setShowMealDetail] = useState(false);
   const [showAddMeal, setShowAddMeal] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [nextMealId, setNextMealId] = useState(9); // Start from 9 since we have IDs 1-8
 
   const navigateMonth = (direction: 'prev' | 'next') => {
     const newDate = new Date(currentDate);
@@ -81,27 +63,19 @@ export function Calendar() {
     if (recipe) {
       const newMeal = {
         ...recipe,
-        id: nextMealId, // Assign unique ID
+        id: 0, // Will be assigned by context
         type: mealType,
         ingredients: ['Sample ingredients'],
         missingIngredients: []
       };
       
-      setMeals(prev => ({
-        ...prev,
-        [date]: [...(prev[date] || []), newMeal]
-      }));
-      
-      setNextMealId(prev => prev + 1); // Increment for next meal
+      addMeal(date, newMeal);
       console.log('Meal added:', newMeal, 'to date:', date);
     }
   };
 
   const handleRemoveMeal = (mealId: number, date: string) => {
-    setMeals(prev => ({
-      ...prev,
-      [date]: prev[date]?.filter(meal => meal.id !== mealId) || []
-    }));
+    removeMeal(mealId, date);
     console.log('Meal removed:', mealId, 'from date:', date);
   };
 
