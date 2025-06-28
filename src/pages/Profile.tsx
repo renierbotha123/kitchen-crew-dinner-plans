@@ -3,177 +3,230 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '../contexts/ThemeContext';
-import { User, Settings, Users, Share2, Moon, Sun, Bell, Heart, Star } from 'lucide-react';
+import { 
+  Settings, 
+  Users, 
+  Share2, 
+  Moon, 
+  Sun, 
+  Bell, 
+  Star, 
+  ChefHat,
+  Calendar,
+  Lock,
+  Shield,
+  LogOut,
+  HelpCircle,
+  FileText
+} from 'lucide-react';
+
+// Import new components
+import { UserHeader } from '@/components/Profile/UserHeader';
+import { StatsCard } from '@/components/Profile/StatsCard';
+import { HouseholdMemberItem } from '@/components/Profile/HouseholdMemberItem';
+import { InviteMemberModal } from '@/components/Profile/InviteMemberModal';
+import { ShareAppSection } from '@/components/Profile/ShareAppSection';
+import { SettingsToggle } from '@/components/Profile/SettingsToggle';
+
+// Mock data
+const currentUser = {
+  id: '1',
+  name: 'Sarah Johnson',
+  email: 'sarah@email.com',
+  avatar: '',
+};
 
 const householdMembers = [
-  { id: 1, name: 'Sarah Johnson', email: 'sarah@email.com', role: 'Admin', avatar: '/placeholder.svg' },
-  { id: 2, name: 'Mike Johnson', email: 'mike@email.com', role: 'Member', avatar: '/placeholder.svg' },
-  { id: 3, name: 'Emma Johnson', email: 'emma@email.com', role: 'Member', avatar: '/placeholder.svg' },
+  { id: '1', name: 'Sarah Johnson', email: 'sarah@email.com', role: 'Admin', avatar: '' },
+  { id: '2', name: 'Mike Johnson', email: 'mike@email.com', role: 'Member', avatar: '' },
+  { id: '3', name: 'Emma Johnson', email: 'emma@email.com', role: 'Member', avatar: '' },
 ];
 
-const stats = [
-  { label: 'Recipes Added', value: 23, icon: Star },
-  { label: 'Meals Planned', value: 156, icon: Heart },
-  { label: 'Family Members', value: 3, icon: Users },
-];
+const stats = {
+  recipesAdded: 23,
+  mealsPlanned: 156,
+};
 
 export function Profile() {
   const { theme, toggleTheme } = useTheme();
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showEditProfile, setShowEditProfile] = useState(false);
+  const [notifications, setNotifications] = useState(true);
+
+  const handleInviteMember = (email: string) => {
+    console.log('Inviting member:', email);
+    // TODO: Implement actual invite logic
+  };
+
+  const handleLogout = () => {
+    console.log('Logging out...');
+    // TODO: Implement actual logout logic
+  };
+
+  const handleEditProfile = () => {
+    setShowEditProfile(true);
+    // TODO: Implement edit profile modal
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-6 pt-12">
-        <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
-            <User className="w-8 h-8 text-white" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">Sarah Johnson</h1>
-            <p className="text-gray-600 dark:text-gray-400">Family Admin</p>
-          </div>
-        </div>
-      </div>
+      {/* User Header */}
+      <UserHeader user={currentUser} onEditProfile={handleEditProfile} />
 
       <div className="px-4 py-6 space-y-6">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-3">
-          {stats.map((stat, index) => (
-            <Card key={index} className="p-4 text-center">
-              <stat.icon className="w-6 h-6 text-primary mx-auto mb-2" />
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stat.value}</p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">{stat.label}</p>
-            </Card>
-          ))}
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 gap-4">
+          <StatsCard
+            icon={ChefHat}
+            value={stats.recipesAdded}
+            label="Recipes Added"
+          />
+          <StatsCard
+            icon={Calendar}
+            value={stats.mealsPlanned}
+            label="Meals Planned"
+          />
         </div>
 
-        {/* Household Management */}
+        {/* Household Section */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Household</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 font-[Jost]">
+              Johnson Household
+            </h2>
             <Button size="sm" onClick={() => setShowInviteModal(true)}>
+              <Users className="w-4 h-4 mr-2" />
               Invite
             </Button>
           </div>
           
           <Card className="divide-y divide-gray-200 dark:divide-gray-700">
             {householdMembers.map((member) => (
-              <div key={member.id} className="p-4 flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
-                    <User className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-gray-100">{member.name}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{member.email}</p>
-                  </div>
-                </div>
-                <span className="text-sm text-gray-500 dark:text-gray-400">{member.role}</span>
-              </div>
+              <HouseholdMemberItem
+                key={member.id}
+                member={member}
+                isCurrentUser={member.id === currentUser.id}
+              />
             ))}
           </Card>
         </div>
 
-        {/* Settings */}
+        {/* Preferences Section */}
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Settings</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 font-[Jost]">
+            Preferences
+          </h2>
           
           <Card className="divide-y divide-gray-200 dark:divide-gray-700">
-            {/* Theme Toggle */}
+            <SettingsToggle
+              icon={theme === 'light' ? Sun : Moon}
+              label="Dark Mode"
+              description="Switch between light and dark themes"
+              checked={theme === 'dark'}
+              onToggle={toggleTheme}
+            />
+            
+            <SettingsToggle
+              icon={Bell}
+              label="Notifications"
+              description="Receive meal planning reminders"
+              checked={notifications}
+              onToggle={setNotifications}
+            />
+          </Card>
+        </div>
+
+        {/* Share App Section */}
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 font-[Jost]">
+            Share & Discover
+          </h2>
+          <ShareAppSection />
+        </div>
+
+        {/* Security Section */}
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 font-[Jost]">
+            Security & Account
+          </h2>
+          
+          <Card className="divide-y divide-gray-200 dark:divide-gray-700">
             <div className="p-4 flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                {theme === 'light' ? (
-                  <Sun className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                ) : (
-                  <Moon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                )}
-                <span className="text-gray-900 dark:text-gray-100">Dark Mode</span>
+                <Lock className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <span className="text-gray-900 dark:text-gray-100 font-[Jost]">Change Password</span>
               </div>
-              <button
-                onClick={toggleTheme}
-                className={`relative w-12 h-6 rounded-full transition-colors ${
-                  theme === 'dark' ? 'bg-primary' : 'bg-gray-300'
-                }`}
+              <Button size="sm" variant="outline">
+                Update
+              </Button>
+            </div>
+
+            <div className="p-4 flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Shield className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <span className="text-gray-900 dark:text-gray-100 font-[Jost]">Privacy Settings</span>
+              </div>
+              <Button size="sm" variant="outline">
+                Manage
+              </Button>
+            </div>
+
+            <div className="p-4">
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleLogout}
+                className="w-full"
               >
-                <div
-                  className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                    theme === 'dark' ? 'translate-x-7' : 'translate-x-1'
-                  }`}
-                />
-              </button>
+                <LogOut className="w-4 h-4 mr-2" />
+                Log Out
+              </Button>
             </div>
+          </Card>
+        </div>
 
-            {/* Notifications */}
+        {/* App Info Section */}
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 font-[Jost]">
+            Support & Info
+          </h2>
+          
+          <Card className="divide-y divide-gray-200 dark:divide-gray-700">
             <div className="p-4 flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                <span className="text-gray-900 dark:text-gray-100">Notifications</span>
+                <HelpCircle className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <span className="text-gray-900 dark:text-gray-100 font-[Jost]">Help & Support</span>
               </div>
               <Button size="sm" variant="outline">
-                Configure
+                Contact
               </Button>
             </div>
 
-            {/* Account Settings */}
             <div className="p-4 flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <Settings className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                <span className="text-gray-900 dark:text-gray-100">Account Settings</span>
+                <FileText className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <span className="text-gray-900 dark:text-gray-100 font-[Jost]">Terms & Privacy</span>
               </div>
               <Button size="sm" variant="outline">
-                Edit
+                View
               </Button>
             </div>
 
-            {/* Share App */}
-            <div className="p-4 flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Share2 className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                <span className="text-gray-900 dark:text-gray-100">Share PrepChef</span>
-              </div>
-              <Button size="sm" variant="outline">
-                Share
-              </Button>
+            <div className="p-4">
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center font-[Jost]">
+                PrepChef v1.0.0
+              </p>
             </div>
           </Card>
         </div>
       </div>
 
-      {/* Invite Modal */}
-      {showInviteModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-              Invite Family Member
-            </h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  placeholder="member@email.com"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
-                />
-              </div>
-              
-              <div className="flex space-x-3">
-                <Button className="flex-1">Send Invite</Button>
-                <Button 
-                  variant="secondary" 
-                  className="flex-1"
-                  onClick={() => setShowInviteModal(false)}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </div>
-      )}
+      {/* Invite Member Modal */}
+      <InviteMemberModal
+        isOpen={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+        onInvite={handleInviteMember}
+      />
     </div>
   );
 }
