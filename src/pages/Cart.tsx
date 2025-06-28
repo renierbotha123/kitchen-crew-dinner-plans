@@ -2,164 +2,236 @@
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { ChevronDown, ArrowLeft, ShoppingBag } from 'lucide-react';
+import { IngredientCard } from '@/components/Cart/IngredientCard';
+import { SelectAlternativeModal } from '@/components/Cart/SelectAlternativeModal';
+import { CostBreakdownSection } from '@/components/Cart/CostBreakdownSection';
 
-const cartItems = [
-  { id: 1, name: 'Ground Beef', amount: '1 lb', price: 8.99, checked: false, category: 'Meat' },
-  { id: 2, name: 'Spaghetti Pasta', amount: '1 box', price: 2.49, checked: true, category: 'Pantry' },
-  { id: 3, name: 'Roma Tomatoes', amount: '6 pieces', price: 3.99, checked: false, category: 'Produce' },
-  { id: 4, name: 'Parmesan Cheese', amount: '1 block', price: 6.99, checked: false, category: 'Dairy' },
-  { id: 5, name: 'Fresh Basil', amount: '1 bunch', price: 2.99, checked: true, category: 'Produce' },
-  { id: 6, name: 'Olive Oil', amount: '1 bottle', price: 4.99, checked: false, category: 'Pantry' },
-];
+// Mock data for cart items grouped by store
+const cartItemsByStore = {
+  'Pick n Pay': [
+    {
+      id: 1,
+      name: 'Ground Beef Premium',
+      image: 'https://images.unsplash.com/photo-1603048297172-c92544798d5a?w=200&h=200&fit=crop',
+      price: 89.99,
+      originalPrice: 99.99,
+      quantity: 1,
+      unit: '500g',
+      inStock: true
+    },
+    {
+      id: 2,
+      name: 'Roma Tomatoes',
+      image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=200&h=200&fit=crop',
+      price: 24.99,
+      originalPrice: null,
+      quantity: 6,
+      unit: 'pieces',
+      inStock: true
+    }
+  ],
+  'Woolworths': [
+    {
+      id: 3,
+      name: 'Spaghetti Pasta',
+      image: 'https://images.unsplash.com/photo-1551892374-ecf8832cf98b?w=200&h=200&fit=crop',
+      price: 18.99,
+      originalPrice: 22.99,
+      quantity: 1,
+      unit: '500g box',
+      inStock: true
+    },
+    {
+      id: 4,
+      name: 'Parmesan Cheese Block',
+      image: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=200&h=200&fit=crop',
+      price: 45.99,
+      originalPrice: null,
+      quantity: 1,
+      unit: '200g',
+      inStock: false
+    }
+  ],
+  'Checkers': [
+    {
+      id: 5,
+      name: 'Fresh Basil',
+      image: 'https://images.unsplash.com/photo-1618164436241-4473940d1f5c?w=200&h=200&fit=crop',
+      price: 12.99,
+      originalPrice: 15.99,
+      quantity: 1,
+      unit: '1 bunch',
+      inStock: true
+    },
+    {
+      id: 6,
+      name: 'Extra Virgin Olive Oil',
+      image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=200&h=200&fit=crop',
+      price: 89.99,
+      originalPrice: null,
+      quantity: 1,
+      unit: '500ml bottle',
+      inStock: true
+    }
+  ]
+};
 
-const categories = ['All', 'Produce', 'Meat', 'Dairy', 'Pantry'];
+// Store logos mapping (in real app these would be actual store logos)
+const storeLogos = {
+  'Pick n Pay': '🛒',
+  'Woolworths': '🍃',
+  'Checkers': '✓',
+  'Spar': '⭐',
+  'Shoprite': '🏪'
+};
 
 export function Cart() {
-  const [items, setItems] = useState(cartItems);
-  const [activeCategory, setActiveCategory] = useState('All');
+  const [items, setItems] = useState(cartItemsByStore);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [showAlternativeModal, setShowAlternativeModal] = useState(false);
+  const [showCostBreakdown, setShowCostBreakdown] = useState(false);
 
-  const toggleItem = (id: number) => {
-    setItems(items.map(item => 
-      item.id === id ? { ...item, checked: !item.checked } : item
-    ));
+  // Calculate totals
+  const subtotal = Object.values(items).flat().reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const deliveryFee = 25.00;
+  const total = subtotal + deliveryFee;
+
+  const handleQuantityChange = (storeKey, itemId, newQuantity) => {
+    if (newQuantity <= 0) {
+      handleRemoveItem(storeKey, itemId);
+      return;
+    }
+    
+    setItems(prev => ({
+      ...prev,
+      [storeKey]: prev[storeKey].map(item =>
+        item.id === itemId ? { ...item, quantity: newQuantity } : item
+      )
+    }));
   };
 
-  const removeItem = (id: number) => {
-    setItems(items.filter(item => item.id !== id));
+  const handleRemoveItem = (storeKey, itemId) => {
+    setItems(prev => ({
+      ...prev,
+      [storeKey]: prev[storeKey].filter(item => item.id !== itemId)
+    }));
   };
 
-  const filteredItems = items.filter(item => 
-    activeCategory === 'All' || item.category === activeCategory
-  );
+  const handleSelectAlternative = (storeKey, item) => {
+    setSelectedItem({ storeKey, item });
+    setShowAlternativeModal(true);
+  };
 
-  const totalPrice = items.reduce((sum, item) => sum + (item.checked ? 0 : item.price), 0);
-  const completedItems = items.filter(item => item.checked).length;
+  const handleAlternativeSelected = (alternatives) => {
+    // In real app, this would update the cart with selected alternative
+    console.log('Selected alternatives:', alternatives);
+    setShowAlternativeModal(false);
+    setSelectedItem(null);
+  };
+
+  // Calculate total items count
+  const totalItems = Object.values(items).flat().length;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-32">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-6 pt-12">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Shopping List</h1>
+          <div className="flex items-center space-x-3">
+            <Button variant="ghost" size="icon" className="p-2">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 font-[Jost]">Shopping List</h1>
+          </div>
           <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
             <ShoppingBag className="w-4 h-4" />
-            <span>{completedItems}/{items.length} items</span>
+            <span>{totalItems} items</span>
           </div>
         </div>
 
-        {/* Summary Card */}
+        {/* Quick Summary */}
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Remaining Total</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">${totalPrice.toFixed(2)}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Total</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 font-[Jost]">R{total.toFixed(2)}</p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-gray-600 dark:text-gray-400">Progress</p>
-              <div className="flex items-center space-x-2">
-                <div className="w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-primary transition-all duration-300"
-                    style={{ width: `${(completedItems / items.length) * 100}%` }}
-                  />
-                </div>
-                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {Math.round((completedItems / items.length) * 100)}%
-                </span>
-              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{Object.keys(items).length} stores</p>
+              <p className="text-sm font-medium text-primary">Ready to checkout</p>
             </div>
           </div>
         </Card>
       </div>
 
       <div className="px-4 py-6">
-        {/* Category Filters */}
-        <div className="flex space-x-2 overflow-x-auto pb-4 scrollbar-hide mb-6">
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                activeCategory === category
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-
-        {/* Shopping List Items */}
-        <div className="space-y-3">
-          {filteredItems.map((item) => (
-            <Card key={item.id} className={`p-4 transition-all duration-200 ${
-              item.checked ? 'opacity-60 bg-gray-50 dark:bg-gray-700' : ''
-            }`}>
-              <div className="flex items-center space-x-3">
-                <Checkbox
-                  checked={item.checked}
-                  onCheckedChange={() => toggleItem(item.id)}
-                  className="w-5 h-5"
-                />
-                
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className={`font-medium text-gray-900 dark:text-gray-100 ${
-                        item.checked ? 'line-through' : ''
-                      }`}>
-                        {item.name}
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {item.amount} • {item.category}
-                      </p>
-                    </div>
-                    
-                    <div className="flex items-center space-x-3">
-                      <span className={`font-semibold ${
-                        item.checked 
-                          ? 'text-gray-400 line-through' 
-                          : 'text-gray-900 dark:text-gray-100'
-                      }`}>
-                        ${item.price.toFixed(2)}
-                      </span>
-                      
-                      <button
-                        onClick={() => removeItem(item.id)}
-                        className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+        {/* Store Sections */}
+        <Accordion type="multiple" defaultValue={Object.keys(items)} className="space-y-4">
+          {Object.entries(items).map(([storeName, storeItems]) => (
+            <AccordionItem key={storeName} value={storeName} className="border rounded-2xl bg-white dark:bg-gray-800 overflow-hidden">
+              <AccordionTrigger className="px-4 py-4 hover:no-underline">
+                <div className="flex items-center justify-between w-full mr-4">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-2xl">{storeLogos[storeName] || '🏪'}</span>
+                    <div className="text-left">
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100 font-[Jost]">{storeName}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{storeItems.length} items</p>
                     </div>
                   </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-gray-900 dark:text-gray-100">
+                      R{storeItems.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Card>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4">
+                <div className="space-y-3">
+                  {storeItems.map((item) => (
+                    <IngredientCard
+                      key={item.id}
+                      item={item}
+                      storeLogo={storeLogos[storeName]}
+                      onQuantityChange={(newQuantity) => handleQuantityChange(storeName, item.id, newQuantity)}
+                      onRemove={() => handleRemoveItem(storeName, item.id)}
+                      onSelectAlternative={() => handleSelectAlternative(storeName, item)}
+                    />
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
           ))}
-        </div>
+        </Accordion>
 
-        {filteredItems.length === 0 && (
+        {Object.values(items).flat().length === 0 && (
           <div className="text-center py-12">
             <ShoppingBag className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400">No items in this category</p>
+            <p className="text-gray-500 dark:text-gray-400 font-[Jost]">Your cart is empty</p>
+            <Button className="mt-4" onClick={() => window.history.back()}>
+              Continue Shopping
+            </Button>
           </div>
         )}
       </div>
 
-      {/* Bottom Action Bar */}
-      <div className="fixed bottom-16 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-4">
-        <div className="flex space-x-3">
-          <Button className="flex-1">
-            Add Item
-          </Button>
-          <Button variant="secondary" className="flex-1">
-            Share List
-          </Button>
-        </div>
-      </div>
+      {/* Cost Breakdown & Checkout Section */}
+      <CostBreakdownSection
+        subtotal={subtotal}
+        deliveryFee={deliveryFee}
+        total={total}
+        isExpanded={showCostBreakdown}
+        onToggle={() => setShowCostBreakdown(!showCostBreakdown)}
+      />
+
+      {/* Select Alternative Modal */}
+      <SelectAlternativeModal
+        isOpen={showAlternativeModal}
+        onClose={() => setShowAlternativeModal(false)}
+        selectedItem={selectedItem}
+        onAlternativeSelected={handleAlternativeSelected}
+      />
     </div>
   );
 }
