@@ -1,172 +1,281 @@
 
 import React, { useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { FloatingActionButton } from '../components/UI/FloatingActionButton';
-import { Search, Filter, Clock, Users, Heart } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Search, Plus } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { FloatingActionButton } from '@/components/UI/FloatingActionButton';
+import { RecipeCard } from '@/components/Recipes/RecipeCard';
+import { FilterTag } from '@/components/Recipes/FilterTag';
+import { PantryItem } from '@/components/Recipes/PantryItem';
+import { AddRecipeModal } from '@/components/Recipes/AddRecipeModal';
+import { AddPantryItemModal } from '@/components/Recipes/AddPantryItemModal';
+import { MissingIngredientsAlert } from '@/components/Recipes/MissingIngredientsAlert';
 
-const recipes = [
+// Mock data for recipes
+const mockRecipes = [
   {
     id: 1,
-    title: 'Spaghetti Carbonara',
-    image: '/placeholder.svg',
+    title: "Grilled Chicken Caesar",
+    image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=300&fit=crop",
     cookTime: 25,
-    servings: 4,
-    difficulty: 'Easy',
-    type: 'Italian',
-    isFavorite: true
+    prepTime: 15,
+    serves: 4,
+    tags: ["Chicken", "Healthy"],
+    source: "User Added",
+    isFavorited: false
   },
   {
     id: 2,
-    title: 'Greek Salad',
-    image: '/placeholder.svg',
-    cookTime: 15,
-    servings: 2,
-    difficulty: 'Easy',
-    type: 'Mediterranean',
-    isFavorite: false
+    title: "Beef Stir Fry",
+    image: "https://images.unsplash.com/photo-1603133872878-684bd47ce73f?w=400&h=300&fit=crop",
+    cookTime: 20,
+    prepTime: 10,
+    serves: 3,
+    tags: ["Beef", "Quick"],
+    source: "URL",
+    isFavorited: true
   },
   {
     id: 3,
-    title: 'Beef Tacos',
-    image: '/placeholder.svg',
-    cookTime: 30,
-    servings: 6,
-    difficulty: 'Medium',
-    type: 'Mexican',
-    isFavorite: true
+    title: "Vegetarian Pasta",
+    image: "https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=400&h=300&fit=crop",
+    cookTime: 15,
+    prepTime: 5,
+    serves: 2,
+    tags: ["Vegetarian", "Pasta"],
+    source: "User Added",
+    isFavorited: false
   },
   {
     id: 4,
-    title: 'Chicken Curry',
-    image: '/placeholder.svg',
-    cookTime: 45,
-    servings: 4,
-    difficulty: 'Medium',
-    type: 'Indian',
-    isFavorite: false
+    title: "Salmon Teriyaki",
+    image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&h=300&fit=crop",
+    cookTime: 18,
+    prepTime: 12,
+    serves: 2,
+    tags: ["Fish", "Healthy"],
+    source: "URL",
+    isFavorited: true
+  },
+  {
+    id: 5,
+    title: "Mediterranean Bowl",
+    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop",
+    cookTime: 0,
+    prepTime: 20,
+    serves: 2,
+    tags: ["Vegetarian", "Healthy", "No Cook"],
+    source: "User Added",
+    isFavorited: false
   }
 ];
 
-const categories = ['All', 'Favorites', 'Italian', 'Mediterranean', 'Mexican', 'Indian', 'Quick'];
+// Mock data for pantry items
+const mockPantryItems = [
+  { id: 1, name: "Chicken Breast", quantity: "2 lbs", notes: "Expires 12/30" },
+  { id: 2, name: "Brown Rice", quantity: "1 bag", notes: "" },
+  { id: 3, name: "Olive Oil", quantity: "500ml", notes: "Extra Virgin" },
+  { id: 4, name: "Onions", quantity: "3 medium", notes: "" },
+  { id: 5, name: "Garlic", quantity: "1 bulb", notes: "" },
+  { id: 6, name: "Canned Tomatoes", quantity: "4 cans", notes: "Diced" }
+];
+
+// Mock missing ingredients
+const mockMissingIngredients = [
+  "Fresh Basil",
+  "Parmesan Cheese",
+  "Heavy Cream"
+];
+
+// Filter options
+const filterOptions = [
+  "All", "Chicken", "Beef", "Fish", "Vegetarian", "Healthy", "Quick", "Pasta", "No Cook"
+];
 
 export function Recipes() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [showFilters, setShowFilters] = useState(false);
+  const [activeTab, setActiveTab] = useState("recipes");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedFilters, setSelectedFilters] = useState<string[]>(["All"]);
+  const [recipes, setRecipes] = useState(mockRecipes);
+  const [pantryItems, setPantryItems] = useState(mockPantryItems);
+  const [showAddRecipeModal, setShowAddRecipeModal] = useState(false);
+  const [showAddPantryModal, setShowAddPantryModal] = useState(false);
 
+  // Filter recipes based on search and selected filters
   const filteredRecipes = recipes.filter(recipe => {
-    const matchesSearch = recipe.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = activeCategory === 'All' || 
-                           (activeCategory === 'Favorites' && recipe.isFavorite) ||
-                           recipe.type === activeCategory ||
-                           (activeCategory === 'Quick' && recipe.cookTime <= 20);
-    return matchesSearch && matchesCategory;
+    const matchesSearch = recipe.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilters = selectedFilters.includes("All") || 
+      selectedFilters.some(filter => recipe.tags.includes(filter));
+    return matchesSearch && matchesFilters;
   });
 
+  // Filter pantry items based on search
+  const filteredPantryItems = pantryItems.filter(item =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleFilterToggle = (filter: string) => {
+    if (filter === "All") {
+      setSelectedFilters(["All"]);
+    } else {
+      setSelectedFilters(prev => {
+        const newFilters = prev.filter(f => f !== "All");
+        if (prev.includes(filter)) {
+          const filtered = newFilters.filter(f => f !== filter);
+          return filtered.length === 0 ? ["All"] : filtered;
+        } else {
+          return [...newFilters, filter];
+        }
+      });
+    }
+  };
+
+  const handleToggleFavorite = (recipeId: number) => {
+    setRecipes(prev => prev.map(recipe => 
+      recipe.id === recipeId 
+        ? { ...recipe, isFavorited: !recipe.isFavorited }
+        : recipe
+    ));
+  };
+
+  const handleRemovePantryItem = (itemId: number) => {
+    setPantryItems(prev => prev.filter(item => item.id !== itemId));
+  };
+
+  const handleAddRecipe = (newRecipe: any) => {
+    const recipe = {
+      id: Date.now(),
+      ...newRecipe,
+      isFavorited: false
+    };
+    setRecipes(prev => [recipe, ...prev]);
+    setShowAddRecipeModal(false);
+  };
+
+  const handleAddPantryItem = (newItem: any) => {
+    const item = {
+      id: Date.now(),
+      ...newItem
+    };
+    setPantryItems(prev => [item, ...prev]);
+    setShowAddPantryModal(false);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
+    <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-6 pt-12">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Recipes</h1>
-        
-        {/* Search Bar */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search recipes..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
-          />
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-colors"
-          >
-            <Filter className="w-4 h-4 text-gray-400" />
-          </button>
-        </div>
-      </div>
+      <div className="sticky top-0 bg-background/95 backdrop-blur-sm border-b border-border z-40">
+        <div className="px-4 py-4">
+          <h1 className="text-2xl font-semibold text-foreground mb-4">
+            Recipes & Pantry
+          </h1>
+          
+          {/* Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="recipes" className="text-sm font-medium">
+                Recipes
+              </TabsTrigger>
+              <TabsTrigger value="pantry" className="text-sm font-medium">
+                Pantry
+              </TabsTrigger>
+            </TabsList>
 
-      <div className="px-4 py-6">
-        {/* Category Filters */}
-        <div className="flex space-x-2 overflow-x-auto pb-4 scrollbar-hide mb-6">
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                activeCategory === category
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
+            {/* Search Bar */}
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder={activeTab === "recipes" ? "Search recipes..." : "Search pantry..."}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
 
-        {/* Recipe Grid */}
-        <div className="grid grid-cols-2 gap-4">
-          {filteredRecipes.map((recipe) => (
-            <Card key={recipe.id} className="overflow-hidden">
-              <div className="relative">
-                <img 
-                  src={recipe.image} 
-                  alt={recipe.title}
-                  className="w-full aspect-square object-cover bg-gray-200 dark:bg-gray-700"
-                />
-                <button className="absolute top-2 right-2 p-1.5 bg-white/80 rounded-full">
-                  <Heart 
-                    className={`w-4 h-4 ${
-                      recipe.isFavorite ? 'text-red-500 fill-current' : 'text-gray-600'
-                    }`} 
+            <TabsContent value="recipes" className="mt-0">
+              {/* Filter Tags */}
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 mb-4">
+                {filterOptions.map(filter => (
+                  <FilterTag
+                    key={filter}
+                    label={filter}
+                    isSelected={selectedFilters.includes(filter)}
+                    onToggle={() => handleFilterToggle(filter)}
                   />
-                </button>
+                ))}
               </div>
-              
-              <div className="p-3">
-                <h3 className="font-medium text-gray-900 dark:text-gray-100 text-sm mb-2">
-                  {recipe.title}
-                </h3>
-                
-                <div className="flex items-center text-xs text-gray-600 dark:text-gray-400 space-x-3 mb-3">
-                  <div className="flex items-center">
-                    <Clock className="w-3 h-3 mr-1" />
-                    {recipe.cookTime}m
-                  </div>
-                  <div className="flex items-center">
-                    <Users className="w-3 h-3 mr-1" />
-                    {recipe.servings}
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-full">
-                    {recipe.difficulty}
-                  </span>
-                  <Button size="sm" variant="outline" className="text-xs">
-                    View
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
 
-        {filteredRecipes.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400">No recipes found</p>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-              Try adjusting your search or filters
-            </p>
-          </div>
-        )}
+              {/* Recipe Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4">
+                {filteredRecipes.map(recipe => (
+                  <RecipeCard
+                    key={recipe.id}
+                    recipe={recipe}
+                    onToggleFavorite={() => handleToggleFavorite(recipe.id)}
+                  />
+                ))}
+                {filteredRecipes.length === 0 && (
+                  <div className="col-span-full text-center py-12 text-muted-foreground">
+                    <p>No recipes found</p>
+                    <p className="text-sm mt-1">Try adjusting your search or filters</p>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="pantry" className="mt-0">
+              {/* Missing Ingredients Alert */}
+              {mockMissingIngredients.length > 0 && (
+                <MissingIngredientsAlert 
+                  ingredients={mockMissingIngredients}
+                  className="mb-4"
+                />
+              )}
+
+              {/* Pantry Items List */}
+              <div className="space-y-3 pb-4">
+                {filteredPantryItems.map(item => (
+                  <PantryItem
+                    key={item.id}
+                    item={item}
+                    onRemove={() => handleRemovePantryItem(item.id)}
+                  />
+                ))}
+                {filteredPantryItems.length === 0 && (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <p>No pantry items found</p>
+                    <p className="text-sm mt-1">Add some items to get started</p>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
 
       {/* Floating Action Button */}
-      <FloatingActionButton onClick={() => console.log('Add recipe')} />
+      <FloatingActionButton
+        onClick={() => {
+          if (activeTab === "recipes") {
+            setShowAddRecipeModal(true);
+          } else {
+            setShowAddPantryModal(true);
+          }
+        }}
+      />
+
+      {/* Modals */}
+      <AddRecipeModal
+        isOpen={showAddRecipeModal}
+        onClose={() => setShowAddRecipeModal(false)}
+        onSubmit={handleAddRecipe}
+      />
+
+      <AddPantryItemModal
+        isOpen={showAddPantryModal}
+        onClose={() => setShowAddPantryModal(false)}
+        onSubmit={handleAddPantryItem}
+      />
     </div>
   );
 }
