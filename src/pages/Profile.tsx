@@ -20,20 +20,32 @@ import {
   FileText
 } from 'lucide-react';
 
-// Import new components
+// Import components
 import { UserHeader } from '@/components/Profile/UserHeader';
 import { StatsCard } from '@/components/Profile/StatsCard';
 import { HouseholdMemberItem } from '@/components/Profile/HouseholdMemberItem';
 import { InviteMemberModal } from '@/components/Profile/InviteMemberModal';
 import { ShareAppSection } from '@/components/Profile/ShareAppSection';
 import { SettingsToggle } from '@/components/Profile/SettingsToggle';
+import { EditProfileModal } from '@/components/Profile/EditProfileModal';
 
 // Mock data
-const currentUser = {
+const initialUser = {
   id: '1',
   name: 'Sarah Johnson',
   email: 'sarah@email.com',
   avatar: '',
+  dietaryPreferences: {
+    primaryDiet: 'vegetarian',
+    allergies: ['Nuts', 'Dairy'],
+    avoidIngredients: ['Mushrooms'],
+    favoriteCuisines: ['Italian', 'Mediterranean', 'Asian'],
+  },
+  notifications: {
+    mealPlanReminders: true,
+    shoppingListAlerts: true,
+    aiRecipeSuggestions: false,
+  },
 };
 
 const householdMembers = [
@@ -52,6 +64,7 @@ export function Profile() {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [notifications, setNotifications] = useState(true);
+  const [currentUser, setCurrentUser] = useState(initialUser);
 
   const handleInviteMember = (email: string) => {
     console.log('Inviting member:', email);
@@ -65,7 +78,12 @@ export function Profile() {
 
   const handleEditProfile = () => {
     setShowEditProfile(true);
-    // TODO: Implement edit profile modal
+  };
+
+  const handleSaveProfile = (updatedUser: any) => {
+    setCurrentUser(updatedUser);
+    console.log('Profile updated:', updatedUser);
+    // TODO: Implement actual save logic (API call)
   };
 
   return (
@@ -151,26 +169,6 @@ export function Profile() {
           </h2>
           
           <Card className="divide-y divide-gray-200 dark:divide-gray-700">
-            <div className="p-4 flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Lock className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                <span className="text-gray-900 dark:text-gray-100 font-[Jost]">Change Password</span>
-              </div>
-              <Button size="sm" variant="outline">
-                Update
-              </Button>
-            </div>
-
-            <div className="p-4 flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Shield className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                <span className="text-gray-900 dark:text-gray-100 font-[Jost]">Privacy Settings</span>
-              </div>
-              <Button size="sm" variant="outline">
-                Manage
-              </Button>
-            </div>
-
             <div className="p-4">
               <Button
                 variant="destructive"
@@ -226,6 +224,14 @@ export function Profile() {
         isOpen={showInviteModal}
         onClose={() => setShowInviteModal(false)}
         onInvite={handleInviteMember}
+      />
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        isOpen={showEditProfile}
+        onClose={() => setShowEditProfile(false)}
+        user={currentUser}
+        onSave={handleSaveProfile}
       />
     </div>
   );
