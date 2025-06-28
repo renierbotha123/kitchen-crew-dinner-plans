@@ -22,20 +22,20 @@ interface MealPlanContextType {
 
 const MealPlanContext = createContext<MealPlanContextType | undefined>(undefined);
 
-// Mock data for planned meals
-const initialMeals = {
+// Mock data for planned meals - properly typed
+const initialMeals: Record<string, Meal[]> = {
   '2024-01-15': [
-    { id: 1, title: 'Spaghetti Carbonara', type: 'dinner', cookTime: 25, prepTime: 15, serves: 4, 
+    { id: 1, title: 'Spaghetti Carbonara', type: 'dinner' as const, cookTime: 25, prepTime: 15, serves: 4, 
       image: '/placeholder.svg', ingredients: ['Pasta', 'Eggs', 'Bacon', 'Parmesan'], missingIngredients: [] },
   ],
   '2024-01-16': [
-    { id: 2, title: 'Greek Salad', type: 'lunch', cookTime: 0, prepTime: 10, serves: 2,
+    { id: 2, title: 'Greek Salad', type: 'lunch' as const, cookTime: 0, prepTime: 10, serves: 2,
       image: '/placeholder.svg', ingredients: ['Tomatoes', 'Cucumber', 'Feta', 'Olives'], missingIngredients: ['Feta'] },
-    { id: 3, title: 'Beef Tacos', type: 'dinner', cookTime: 20, prepTime: 10, serves: 4,
+    { id: 3, title: 'Beef Tacos', type: 'dinner' as const, cookTime: 20, prepTime: 10, serves: 4,
       image: '/placeholder.svg', ingredients: ['Ground Beef', 'Tortillas', 'Lettuce', 'Cheese'], missingIngredients: [] }
   ],
   '2024-01-17': [
-    { id: 4, title: 'Chicken Curry', type: 'dinner', cookTime: 35, prepTime: 15, serves: 6,
+    { id: 4, title: 'Chicken Curry', type: 'dinner' as const, cookTime: 35, prepTime: 15, serves: 6,
       image: '/placeholder.svg', ingredients: ['Chicken', 'Curry Powder', 'Coconut Milk', 'Rice'], missingIngredients: ['Curry Powder'] }
   ],
 };

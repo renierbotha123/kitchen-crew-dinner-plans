@@ -61,10 +61,13 @@ export function Calendar() {
   const handleAddMeal = (recipeId: number, date: string, mealType: string) => {
     const recipe = availableRecipes.find(r => r.id === recipeId);
     if (recipe) {
+      // Properly type the meal type
+      const typedMealType = mealType as 'breakfast' | 'lunch' | 'dinner';
+      
       const newMeal = {
         ...recipe,
         id: 0, // Will be assigned by context
-        type: mealType,
+        type: typedMealType,
         ingredients: ['Sample ingredients'],
         missingIngredients: []
       };
