@@ -13,6 +13,7 @@ import { Cart } from "./pages/Cart";
 import { Profile } from "./pages/Profile";
 import { Recipes } from "./pages/Recipes";
 import { RecipeDetail } from "./pages/RecipeDetail";
+import { Notes } from "./pages/Notes";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -36,7 +37,7 @@ function AppContent() {
         <Route path="/profile" element={<Profile />} />
         
         {/* Menu Routes */}
-        <Route path="/notes" element={<NotFound />} />
+        <Route path="/notes" element={<Notes />} />
         <Route path="/help" element={<NotFound />} />
         <Route path="/settings" element={<NotFound />} />
         
