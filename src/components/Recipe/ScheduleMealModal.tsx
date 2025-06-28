@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { X, ShoppingCart } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -34,35 +34,27 @@ export function ScheduleMealModal({
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl p-0">
+      <SheetContent side="bottom" className="h-screen rounded-t-3xl p-0">
         {/* Drag Indicator */}
         <div className="flex justify-center pt-3 pb-2">
           <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
         </div>
         
         <SheetHeader className="px-6 pb-4">
-          <div className="flex items-center justify-between">
-            <SheetTitle>Schedule Meal</SheetTitle>
-            <button
-              onClick={onClose}
-              className="p-2 -mr-2 rounded-full hover:bg-accent transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+          <SheetTitle>Schedule Meal</SheetTitle>
         </SheetHeader>
         
         <div className="flex-1 px-6 pb-24 overflow-y-auto">
           <div className="space-y-6">
-            {/* Calendar */}
-            <div className="flex justify-center">
+            {/* Calendar - Full Width */}
+            <div className="w-full">
               <CalendarComponent
                 mode="single"
                 selected={selectedDate}
                 onSelect={onSelectDate}
                 disabled={(date) => date < new Date()}
                 initialFocus
-                className="rounded-md border"
+                className="rounded-md border w-full"
               />
             </div>
 
