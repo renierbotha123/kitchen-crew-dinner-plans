@@ -20,7 +20,7 @@ const queryClient = new QueryClient();
 
 function AppContent() {
   const location = useLocation();
-  const showBottomNav = location.pathname !== '/profile';
+  const showBottomNav = true; // Show bottom nav on all pages
 
   return (
     <div className="min-h-screen bg-background">
@@ -44,7 +44,7 @@ function AppContent() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       
-      {/* Bottom Navigation - conditionally rendered */}
+      {/* Bottom Navigation - shown on all pages */}
       {showBottomNav && <BottomNavigation />}
     </div>
   );
