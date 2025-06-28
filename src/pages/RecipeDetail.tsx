@@ -1,12 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { ArrowLeft, Heart, Calendar, ShoppingCart, Clock, Users, ChefHat } from 'lucide-react';
+import { ArrowLeft, Heart, Calendar, ShoppingCart, Clock, Users, ChefHat, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
 
 // Mock recipe data - in a real app, this would come from props, API, or context
 const mockRecipe = {
@@ -118,6 +120,9 @@ export function RecipeDetail() {
   const [checkedIngredients, setCheckedIngredients] = useState<boolean[]>(
     new Array(recipe.ingredients.length).fill(false)
   );
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedMealType, setSelectedMealType] = useState<'breakfast' | 'lunch' | 'dinner'>('dinner');
 
   // Hide bottom navigation when component mounts, show it when unmounting
   useEffect(() => {
@@ -150,10 +155,19 @@ export function RecipeDetail() {
   };
 
   const handleAddToCalendar = () => {
-    toast({
-      title: "Added to meal plan",
-      description: "Recipe has been added to your calendar",
-    });
+    setShowCalendarModal(true);
+  };
+
+  const handleConfirmAddToCalendar = () => {
+    if (selectedDate) {
+      toast({
+        title: "Added to meal plan",
+        description: `Recipe scheduled for ${format(selectedDate, 'PPP')} - ${selectedMealType}`,
+      });
+      setShowCalendarModal(false);
+      setSelectedDate(undefined);
+      setSelectedMealType('dinner');
+    }
   };
 
   const handleAddToCart = () => {
@@ -174,6 +188,12 @@ export function RecipeDetail() {
       return newChecked;
     });
   };
+
+  const mealTypeOptions = [
+    { value: 'breakfast', label: 'Breakfast' },
+    { value: 'lunch', label: 'Lunch' },
+    { value: 'dinner', label: 'Dinner' }
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -308,16 +328,16 @@ export function RecipeDetail() {
               {isFavorited ? 'Favorited' : 'Favorite'}
             </Button>
             <Button
-              variant="outline"
               size="lg"
               onClick={handleAddToCalendar}
-              className="flex-1"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
             >
               <Calendar className="w-4 h-4 mr-2" />
               Add to Plan
             </Button>
           </div>
           <Button
+            variant="outline"
             size="lg"
             onClick={handleAddToCart}
             className="w-full"
@@ -332,6 +352,7 @@ export function RecipeDetail() {
       {isFromDashboard && (
         <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 pb-6">
           <Button
+            variant="outline"
             size="lg"
             onClick={handleAddToCart}
             className="w-full"
@@ -341,6 +362,73 @@ export function RecipeDetail() {
           </Button>
         </div>
       )}
+
+      {/* Calendar Modal */}
+      <Dialog open={showCalendarModal} onOpenChange={setShowCalendarModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Schedule Meal</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Calendar */}
+            <div className="flex justify-center">
+              <CalendarComponent
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                disabled={(date) => date < new Date()}
+                initialFocus
+                className="rounded-md border"
+              />
+            </div>
+
+            {/* Meal Type Selector */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-medium text-foreground">Meal Type</h3>
+              <div className="flex gap-2">
+                {mealTypeOptions.map((option) => (
+                  <Button
+                    key={option.value}
+                    variant={selectedMealType === option.value ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedMealType(option.value as 'breakfast' | 'lunch' | 'dinner')}
+                    className="flex-1"
+                  >
+                    {option.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowCalendarModal(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleAddToCart}
+                variant="outline"
+                className="flex-1"
+              >
+                <ShoppingCart className="w-4 h-4 mr-2" />
+                Add to Cart
+              </Button>
+              <Button
+                onClick={handleConfirmAddToCalendar}
+                disabled={!selectedDate}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+              >
+                Schedule
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
