@@ -79,15 +79,18 @@ export function RecipeDetail() {
   useEffect(() => {
     const bottomNav = document.querySelector('nav[class*="fixed bottom-0"]') as HTMLElement;
     if (bottomNav && !isFromDashboard) {
+      // Store original visibility state
+      const originalDisplay = bottomNav.style.display;
       bottomNav.style.display = 'none';
-    }
 
-    // Cleanup: show navigation when leaving the page
-    return () => {
-      if (bottomNav && !isFromDashboard) {
-        bottomNav.style.display = 'flex';
-      }
-    };
+      // Cleanup: restore navigation when leaving the page
+      return () => {
+        // Only restore if the element still exists and we're the ones who hid it
+        if (bottomNav) {
+          bottomNav.style.display = originalDisplay || '';
+        }
+      };
+    }
   }, [isFromDashboard]);
 
   // Handlers
