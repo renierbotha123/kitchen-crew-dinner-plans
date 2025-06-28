@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Clock, Users, ChefHat, Heart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -22,9 +23,10 @@ interface RecipeCardProps {
 }
 
 export function RecipeCard({ recipe, onToggleFavorite }: RecipeCardProps) {
+  const navigate = useNavigate();
+
   const handleCardClick = () => {
-    // Navigate to recipe detail page
-    console.log('Navigate to recipe:', recipe.id);
+    navigate(`/recipes/${recipe.id}`);
   };
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
