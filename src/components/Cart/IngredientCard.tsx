@@ -110,7 +110,6 @@ export function IngredientCard({
             size="sm"
             className="rounded-2xl text-xs"
             onClick={onSelectAlternative}
-            disabled={!item.inStock}
           >
             Alternative
           </Button>
