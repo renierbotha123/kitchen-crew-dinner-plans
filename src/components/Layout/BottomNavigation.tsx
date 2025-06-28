@@ -32,8 +32,8 @@ export function BottomNavigation() {
               to={path}
               className={({ isActive }) =>
                 `flex flex-col items-center justify-center flex-1 py-2 px-1 rounded-xl transition-all duration-200 ${
-                  isActive
-                    ? 'text-primary scale-105 bg-primary/10'
+                  isActive && !isMenuRouteActive
+                    ? 'text-primary bg-primary/10'
                     : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
                 }`
               }
@@ -41,13 +41,11 @@ export function BottomNavigation() {
               {({ isActive }) => (
                 <>
                   <Icon
-                    className={`w-5 h-5 transition-transform duration-200 ${
-                      isActive ? 'scale-110' : ''
-                    }`}
+                    className="w-5 h-5 transition-transform duration-200"
                   />
                   <span
                     className={`text-xs font-medium mt-1 transition-colors duration-200 ${
-                      isActive ? 'text-primary' : 'text-gray-500 dark:text-gray-400'
+                      isActive && !isMenuRouteActive ? 'text-primary' : 'text-gray-500 dark:text-gray-400'
                     }`}
                   >
                     {label}
@@ -62,13 +60,11 @@ export function BottomNavigation() {
             onClick={handleMenuToggle}
             className={`flex flex-col items-center justify-center flex-1 py-2 px-1 rounded-xl transition-all duration-200 ${
               isMenuRouteActive || showMenu
-                ? 'text-primary scale-105 bg-primary/10'
+                ? 'text-primary bg-primary/10'
                 : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
             }`}
           >
-            <Menu className={`w-5 h-5 transition-transform duration-200 ${
-              isMenuRouteActive || showMenu ? 'scale-110' : ''
-            }`} />
+            <Menu className="w-5 h-5 transition-transform duration-200" />
             <span className={`text-xs font-medium mt-1 transition-colors duration-200 ${
               isMenuRouteActive || showMenu ? 'text-primary' : 'text-gray-500 dark:text-gray-400'
             }`}>
