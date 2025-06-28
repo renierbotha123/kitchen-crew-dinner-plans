@@ -38,6 +38,11 @@ const App = () => (
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/profile" element={<Profile />} />
                 
+                {/* Menu Routes */}
+                <Route path="/notes" element={<NotFound />} />
+                <Route path="/help" element={<NotFound />} />
+                <Route path="/settings" element={<NotFound />} />
+                
                 {/* Catch-all route for 404 */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
