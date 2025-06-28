@@ -13,8 +13,8 @@ interface AddRecipeModalProps {
   onSubmit: (recipe: any) => void;
 }
 
-const FOOD_TYPES = ['Chicken', 'Beef', 'Fish', 'Pork', 'Vegetarian', 'Vegan', 'Pasta', 'Rice', 'Soup', 'Salad'];
-const MEAL_TYPES = ['Healthy', 'Quick', 'Easy', 'Comfort Food', 'Spicy', 'Sweet', 'Low Carb', 'High Protein'];
+const FOOD_TYPES = ['Chicken', 'Beef', 'Fish', 'Pork', 'Vegetarian', 'Vegan', 'Pasta', 'Rice', 'Soup', 'Salad', 'Other'];
+const MEAL_TYPES = ['Healthy', 'Quick', 'Easy', 'Comfort Food', 'Spicy', 'Sweet', 'Low Carb', 'High Protein', "Other"];
 
 export function AddRecipeModal({ isOpen, onClose, onSubmit }: AddRecipeModalProps) {
   const [formData, setFormData] = useState({
