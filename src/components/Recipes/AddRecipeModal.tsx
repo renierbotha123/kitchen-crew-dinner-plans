@@ -13,6 +13,9 @@ interface AddRecipeModalProps {
   onSubmit: (recipe: any) => void;
 }
 
+const FOOD_TYPES = ['Chicken', 'Beef', 'Fish', 'Pork', 'Vegetarian', 'Vegan', 'Pasta', 'Rice', 'Soup', 'Salad'];
+const MEAL_TYPES = ['Healthy', 'Quick', 'Easy', 'Comfort Food', 'Spicy', 'Sweet', 'Low Carb', 'High Protein'];
+
 export function AddRecipeModal({ isOpen, onClose, onSubmit }: AddRecipeModalProps) {
   const [formData, setFormData] = useState({
     title: '',
@@ -25,16 +28,22 @@ export function AddRecipeModal({ isOpen, onClose, onSubmit }: AddRecipeModalProp
   });
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [currentIngredient, setCurrentIngredient] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
-  const [currentTag, setCurrentTag] = useState('');
+  const [foodType, setFoodType] = useState<string>('');
+  const [mealType, setMealType] = useState<string>('');
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const addIngredient = () => {
+  const addIngredients = () => {
     if (currentIngredient.trim()) {
-      setIngredients(prev => [...prev, currentIngredient.trim()]);
+      // Split by comma and clean up each ingredient
+      const newIngredients = currentIngredient
+        .split(',')
+        .map(ingredient => ingredient.trim())
+        .filter(ingredient => ingredient.length > 0);
+      
+      setIngredients(prev => [...prev, ...newIngredients]);
       setCurrentIngredient('');
     }
   };
@@ -43,19 +52,18 @@ export function AddRecipeModal({ isOpen, onClose, onSubmit }: AddRecipeModalProp
     setIngredients(prev => prev.filter((_, i) => i !== index));
   };
 
-  const addTag = () => {
-    if (currentTag.trim() && !tags.includes(currentTag.trim())) {
-      setTags(prev => [...prev, currentTag.trim()]);
-      setCurrentTag('');
-    }
+  const handleFoodTypeSelect = (type: string) => {
+    setFoodType(foodType === type ? '' : type);
   };
 
-  const removeTag = (tag: string) => {
-    setTags(prev => prev.filter(t => t !== tag));
+  const handleMealTypeSelect = (type: string) => {
+    setMealType(mealType === type ? '' : type);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const tags = [foodType, mealType].filter(tag => tag.length > 0);
     
     const recipe = {
       ...formData,
@@ -80,9 +88,9 @@ export function AddRecipeModal({ isOpen, onClose, onSubmit }: AddRecipeModalProp
       source: 'User Added'
     });
     setIngredients([]);
-    setTags([]);
     setCurrentIngredient('');
-    setCurrentTag('');
+    setFoodType('');
+    setMealType('');
   };
 
   if (!isOpen) return null;
@@ -181,13 +189,16 @@ export function AddRecipeModal({ isOpen, onClose, onSubmit }: AddRecipeModalProp
                 <Input
                   value={currentIngredient}
                   onChange={(e) => setCurrentIngredient(e.target.value)}
-                  placeholder="Add ingredient"
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addIngredient())}
+                  placeholder="Add ingredients (separate with commas)"
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addIngredients())}
                 />
-                <Button type="button" onClick={addIngredient} size="sm">
+                <Button type="button" onClick={addIngredients} size="sm">
                   <Plus className="w-4 h-4" />
                 </Button>
               </div>
+              <p className="text-xs text-muted-foreground mb-2">
+                Tip: Separate multiple ingredients with commas (e.g., "2 cups flour, 1 tsp salt, 3 eggs")
+              </p>
               <div className="flex flex-wrap gap-2">
                 {ingredients.map((ingredient, index) => (
                   <Badge key={index} variant="secondary" className="flex items-center gap-1">
@@ -201,28 +212,35 @@ export function AddRecipeModal({ isOpen, onClose, onSubmit }: AddRecipeModalProp
               </div>
             </div>
 
-            {/* Tags */}
+            {/* Food Type */}
             <div>
-              <Label>Tags</Label>
-              <div className="flex gap-2 mt-1 mb-2">
-                <Input
-                  value={currentTag}
-                  onChange={(e) => setCurrentTag(e.target.value)}
-                  placeholder="Add tag (e.g., Chicken, Healthy)"
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                />
-                <Button type="button" onClick={addTag} size="sm">
-                  <Plus className="w-4 h-4" />
-                </Button>
+              <Label>Food Type (select one)</Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {FOOD_TYPES.map((type) => (
+                  <Badge
+                    key={type}
+                    variant={foodType === type ? "default" : "outline"}
+                    className="cursor-pointer"
+                    onClick={() => handleFoodTypeSelect(type)}
+                  >
+                    {type}
+                  </Badge>
+                ))}
               </div>
-              <div className="flex flex-wrap gap-2">
-                {tags.map((tag) => (
-                  <Badge key={tag} variant="outline" className="flex items-center gap-1">
-                    {tag}
-                    <X 
-                      className="w-3 h-3 cursor-pointer" 
-                      onClick={() => removeTag(tag)}
-                    />
+            </div>
+
+            {/* Meal Type */}
+            <div>
+              <Label>Meal Type (select one)</Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {MEAL_TYPES.map((type) => (
+                  <Badge
+                    key={type}
+                    variant={mealType === type ? "default" : "outline"}
+                    className="cursor-pointer"
+                    onClick={() => handleMealTypeSelect(type)}
+                  >
+                    {type}
                   </Badge>
                 ))}
               </div>
