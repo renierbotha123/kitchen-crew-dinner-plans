@@ -38,20 +38,12 @@ export function BottomNavigation() {
                 }`
               }
             >
-              {({ isActive }) => (
-                <>
-                  <Icon
-                    className="w-5 h-5 transition-transform duration-200"
-                  />
-                  <span
-                    className={`text-xs font-medium mt-1 transition-colors duration-200 ${
-                      isActive && !isMenuRouteActive ? 'text-primary' : 'text-gray-500 dark:text-gray-400'
-                    }`}
-                  >
-                    {label}
-                  </span>
-                </>
-              )}
+              <Icon className="w-5 h-5 transition-transform duration-200" />
+              <span className={`text-xs font-medium mt-1 transition-colors duration-200 ${
+                location.pathname === path && !isMenuRouteActive ? 'text-primary' : 'text-gray-500 dark:text-gray-400'
+              }`}>
+                {label}
+              </span>
             </NavLink>
           ))}
           
