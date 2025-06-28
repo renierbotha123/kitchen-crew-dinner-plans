@@ -28,7 +28,7 @@ const queryClient = new QueryClient();
 function AppContent() {
   const location = useLocation();
   
-  // Don't show bottom nav on auth screens
+  // Don't show bottom nav on auth screens (temporarily disabled)
   const authRoutes = ['/welcome', '/signup', '/login', '/household-setup'];
   const showBottomNav = !authRoutes.includes(location.pathname);
 
@@ -40,68 +40,21 @@ function AppContent() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         
-        {/* Protected Routes */}
-        <Route path="/household-setup" element={
-          <ProtectedRoute>
-            <HouseholdSetup />
-          </ProtectedRoute>
-        } />
+        {/* TEMPORARY: Remove auth protection from household-setup */}
+        <Route path="/household-setup" element={<HouseholdSetup />} />
         
-        {/* Main App Routes - Protected and require household */}
-        <Route path="/" element={
-          <ProtectedRoute requireHousehold={true}>
-            <Dashboard />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/calendar" element={
-          <ProtectedRoute requireHousehold={true}>
-            <Calendar />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/recipes" element={
-          <ProtectedRoute requireHousehold={true}>
-            <Recipes />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/recipes/:id" element={
-          <ProtectedRoute requireHousehold={true}>
-            <RecipeDetail />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/cart" element={
-          <ProtectedRoute requireHousehold={true}>
-            <Cart />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/profile" element={
-          <ProtectedRoute requireHousehold={true}>
-            <Profile />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/notes" element={
-          <ProtectedRoute requireHousehold={true}>
-            <Notes />
-          </ProtectedRoute>
-        } />
+        {/* TEMPORARY: Remove auth protection from main routes */}
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/calendar" element={<Calendar />} />
+        <Route path="/recipes" element={<Recipes />} />
+        <Route path="/recipes/:id" element={<RecipeDetail />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/notes" element={<Notes />} />
         
         {/* Menu Routes */}
-        <Route path="/help" element={
-          <ProtectedRoute requireHousehold={true}>
-            <NotFound />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/settings" element={
-          <ProtectedRoute requireHousehold={true}>
-            <NotFound />
-          </ProtectedRoute>
-        } />
+        <Route path="/help" element={<NotFound />} />
+        <Route path="/settings" element={<NotFound />} />
         
         {/* Catch-all route for 404 */}
         <Route path="*" element={<NotFound />} />

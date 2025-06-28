@@ -11,6 +11,12 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children, requireHousehold = false }: ProtectedRouteProps) {
   const { user, profile, loading } = useAuth();
 
+  // TEMPORARY: Bypass all authentication checks
+  console.log('ProtectedRoute: Bypassing authentication (temporary)');
+  return <>{children}</>;
+
+  // Original code commented out for temporary bypass
+  /*
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -31,4 +37,5 @@ export function ProtectedRoute({ children, requireHousehold = false }: Protected
   }
 
   return <>{children}</>;
+  */
 }
