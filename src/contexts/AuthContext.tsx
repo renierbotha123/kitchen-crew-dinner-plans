@@ -30,6 +30,8 @@ interface AuthContextType {
   refreshUserHouseholds: () => Promise<void>;
   selectHousehold: (householdId: string) => Promise<{ error: any }>;
   leaveHousehold: (householdId: string) => Promise<{ error: any }>;
+  sendInvitation: (email: string, householdId: string) => Promise<{ error: any; data?: any }>;
+  acceptInvitation: (inviteCode: string) => Promise<{ error: any; data?: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -314,6 +316,70 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const sendInvitation = async (email: string, householdId: string) => {
+    if (!user?.id || !session?.access_token) {
+      return { error: { message: 'User not authenticated' } };
+    }
+
+    try {
+      console.log('Sending invitation:', { email, householdId });
+      
+      const { data, error } = await supabase.functions.invoke('send-invitation', {
+        body: {
+          email,
+          householdId
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('Error sending invitation:', error);
+        return { error };
+      }
+
+      console.log('Invitation sent successfully:', data);
+      return { error: null, data };
+    } catch (error: any) {
+      console.error('Error sending invitation:', error);
+      return { error };
+    }
+  };
+
+  const acceptInvitation = async (inviteCode: string) => {
+    if (!user?.id) {
+      return { error: { message: 'User not authenticated' } };
+    }
+
+    try {
+      console.log('Accepting invitation:', inviteCode);
+      
+      const { data, error } = await supabase
+        .rpc('accept_household_invitation', {
+          invitation_code: inviteCode
+        });
+
+      if (error) {
+        console.error('Error accepting invitation:', error);
+        return { error };
+      }
+
+      if (!data.success) {
+        return { error: { message: data.error } };
+      }
+
+      // Refresh user data after accepting invitation
+      await Promise.all([refreshProfile(), refreshUserHouseholds()]);
+      
+      console.log('Invitation accepted successfully:', data);
+      return { error: null, data };
+    } catch (error: any) {
+      console.error('Error accepting invitation:', error);
+      return { error };
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -328,6 +394,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       refreshUserHouseholds,
       selectHousehold,
       leaveHousehold,
+      sendInvitation,
+      acceptInvitation,
     }}>
       {children}
     </AuthContext.Provider>

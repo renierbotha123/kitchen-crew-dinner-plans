@@ -23,15 +23,19 @@ import { HouseholdSetup } from "./pages/HouseholdSetup";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { HouseholdSelection } from "./pages/HouseholdSelection";
+import { InviteAccept } from "./pages/InviteAccept";
 
 const queryClient = new QueryClient();
 
 function AppContent() {
   const location = useLocation();
   
-  // Don't show bottom nav on auth screens
+  // Don't show bottom nav on auth screens and invite page
   const authRoutes = ['/welcome', '/signup', '/login', '/household-setup', '/household-selection'];
-  const showBottomNav = !authRoutes.includes(location.pathname);
+  const hideNavRoutes = [...authRoutes, '/invite'];
+  const showBottomNav = !hideNavRoutes.some(route => 
+    location.pathname === route || location.pathname.startsWith(route + '/')
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -40,6 +44,9 @@ function AppContent() {
         <Route path="/welcome" element={<Welcome />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
+        
+        {/* Invitation Route - Public but requires handling in component */}
+        <Route path="/invite/:inviteCode" element={<InviteAccept />} />
         
         {/* Household Setup - Protected but no household required - only for users with NO households */}
         <Route path="/household-setup" element={

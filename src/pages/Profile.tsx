@@ -34,11 +34,6 @@ export function Profile() {
     setIsEditProfileOpen(true);
   };
 
-  const handleInviteMember = (email: string) => {
-    console.log('Inviting member:', email);
-    // TODO: Implement invite functionality
-  };
-
   const handleLogout = async () => {
     try {
       await signOut();
@@ -56,7 +51,7 @@ export function Profile() {
       <div className="px-4 py-6 pb-24 space-y-6">
         
         {/* Household Management Section */}
-        <HouseholdManagement />
+        <HouseholdManagement onInviteMember={() => setIsInviteMemberOpen(true)} />
         
         <Separator />
 
@@ -167,7 +162,6 @@ export function Profile() {
       <InviteMemberModal
         isOpen={isInviteMemberOpen}
         onClose={() => setIsInviteMemberOpen(false)}
-        onInvite={handleInviteMember}
       />
     </div>
   );

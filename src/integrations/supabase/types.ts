@@ -9,6 +9,53 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      household_invitations: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          expires_at: string
+          household_id: string
+          id: string
+          invite_code: string
+          invited_by: string
+          invited_email: string
+          status: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          expires_at?: string
+          household_id: string
+          id?: string
+          invite_code?: string
+          invited_by: string
+          invited_email: string
+          status?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          expires_at?: string
+          household_id?: string
+          id?: string
+          invite_code?: string
+          invited_by?: string
+          invited_email?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "household_invitations_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "households"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       households: {
         Row: {
           created_at: string
@@ -111,6 +158,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_household_invitation: {
+        Args: { invitation_code: string }
+        Returns: Json
+      }
+      create_household_invitation: {
+        Args: { p_household_id: string; p_invited_email: string }
+        Returns: Json
+      }
       get_user_household_id: {
         Args: Record<PropertyKey, never>
         Returns: string

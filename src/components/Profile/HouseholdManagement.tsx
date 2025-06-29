@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Home, Users, LogOut, AlertTriangle } from 'lucide-react';
+import { Home, Users, LogOut, AlertTriangle, UserPlus } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -17,7 +17,11 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
-export function HouseholdManagement() {
+interface HouseholdManagementProps {
+  onInviteMember?: () => void;
+}
+
+export function HouseholdManagement({ onInviteMember }: HouseholdManagementProps) {
   const { userHouseholds, profile, leaveHousehold, refreshProfile, refreshUserHouseholds } = useAuth();
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState('');
@@ -57,9 +61,22 @@ export function HouseholdManagement() {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 font-[Jost]">
-        Your Households
-      </h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 font-[Jost]">
+          Your Households
+        </h3>
+        {profile?.current_household_id && onInviteMember && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onInviteMember}
+            className="flex items-center space-x-2"
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>Invite</span>
+          </Button>
+        )}
+      </div>
       
       {error && <ErrorMessage message={error} />}
 
