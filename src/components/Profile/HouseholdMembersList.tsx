@@ -32,37 +32,50 @@ export function HouseholdMembersList({ householdId }: HouseholdMembersListProps)
       try {
         console.log('Fetching members for household:', householdId);
         
-        const { data, error } = await supabase
+        // First get the user_households data
+        const { data: householdMembersData, error: householdError } = await supabase
           .from('user_households')
-          .select(`
-            user_id,
-            role,
-            joined_at,
-            profiles!user_households_user_id_fkey (
-              first_name,
-              last_name,
-              email
-            )
-          `)
+          .select('user_id, role, joined_at')
           .eq('household_id', householdId);
 
-        if (error) {
-          console.error('Error fetching household members:', error);
+        if (householdError) {
+          console.error('Error fetching household members:', householdError);
           return;
         }
 
-        console.log('Fetched members data:', data);
+        if (!householdMembersData || householdMembersData.length === 0) {
+          setMembers([]);
+          return;
+        }
 
-        // Transform the data to flatten the profiles
-        const transformedMembers = data?.map(member => ({
-          user_id: member.user_id,
-          role: member.role,
-          joined_at: member.joined_at,
-          first_name: member.profiles?.first_name,
-          last_name: member.profiles?.last_name,
-          email: member.profiles?.email,
-        })) || [];
+        // Get the user IDs
+        const userIds = householdMembersData.map(member => member.user_id);
 
+        // Fetch profile data for these users
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name, email')
+          .in('id', userIds);
+
+        if (profilesError) {
+          console.error('Error fetching profiles:', profilesError);
+          return;
+        }
+
+        // Combine the data
+        const transformedMembers = householdMembersData.map(member => {
+          const profile = profilesData?.find(p => p.id === member.user_id);
+          return {
+            user_id: member.user_id,
+            role: member.role,
+            joined_at: member.joined_at,
+            first_name: profile?.first_name,
+            last_name: profile?.last_name,
+            email: profile?.email,
+          };
+        });
+
+        console.log('Transformed members data:', transformedMembers);
         setMembers(transformedMembers);
       } catch (error) {
         console.error('Error fetching household members:', error);
