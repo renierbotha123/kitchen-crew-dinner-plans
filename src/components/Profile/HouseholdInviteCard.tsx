@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { QRCodeGenerator } from '@/components/QR/QRCodeGenerator';
+import { HouseholdMembersList } from './HouseholdMembersList';
 import { useToast } from '@/hooks/use-toast';
 
 interface HouseholdInviteCardProps {
@@ -60,6 +61,9 @@ export function HouseholdInviteCard({ household, inviteCode, onLeaveHousehold }:
           </p>
         </div>
       </div>
+
+      {/* Household Members */}
+      <HouseholdMembersList householdId={household.household_id} />
 
       {/* Invite Code Section */}
       <div className="space-y-4">
