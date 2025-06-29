@@ -9,7 +9,7 @@ import { Card } from '@/components/ui/card';
 export function InviteAccept() {
   const { inviteCode } = useParams<{ inviteCode: string }>();
   const navigate = useNavigate();
-  const { user, acceptInvitation } = useAuth();
+  const { user, joinHouseholdByCode } = useAuth();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
   const [householdName, setHouseholdName] = useState('');
@@ -34,7 +34,7 @@ export function InviteAccept() {
     if (!inviteCode) return;
 
     try {
-      const { error, data } = await acceptInvitation(inviteCode);
+      const { error, data } = await joinHouseholdByCode(inviteCode);
       
       if (error) {
         setStatus('error');

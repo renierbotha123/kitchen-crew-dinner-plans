@@ -24,6 +24,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { HouseholdSelection } from "./pages/HouseholdSelection";
 import { InviteAccept } from "./pages/InviteAccept";
+import { JoinHousehold } from "./pages/JoinHousehold";
 
 const queryClient = new QueryClient();
 

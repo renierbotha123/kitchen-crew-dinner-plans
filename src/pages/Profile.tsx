@@ -9,7 +9,6 @@ import { StatsCard } from '@/components/Profile/StatsCard';
 import { SettingsToggle } from '@/components/Profile/SettingsToggle';
 import { ShareAppSection } from '@/components/Profile/ShareAppSection';
 import { EditProfileModal } from '@/components/Profile/EditProfileModal';
-import { InviteMemberModal } from '@/components/Profile/InviteMemberModal';
 import { HouseholdManagement } from '@/components/Profile/HouseholdManagement';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -19,7 +18,6 @@ export function Profile() {
   const { user, profile, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
-  const [isInviteMemberOpen, setIsInviteMemberOpen] = useState(false);
 
   const displayName = profile?.first_name && profile?.last_name 
     ? `${profile.first_name} ${profile.last_name}`
@@ -51,7 +49,7 @@ export function Profile() {
       <div className="px-4 py-6 pb-24 space-y-6">
         
         {/* Household Management Section */}
-        <HouseholdManagement onInviteMember={() => setIsInviteMemberOpen(true)} />
+        <HouseholdManagement />
         
         <Separator />
 
@@ -157,11 +155,6 @@ export function Profile() {
           console.log('Profile updated:', updatedProfile);
           setIsEditProfileOpen(false);
         }}
-      />
-
-      <InviteMemberModal
-        isOpen={isInviteMemberOpen}
-        onClose={() => setIsInviteMemberOpen(false)}
       />
     </div>
   );

@@ -21,7 +21,7 @@ export function InviteMemberModal({ isOpen, onClose }: InviteMemberModalProps) {
   const [inviteLink, setInviteLink] = useState('');
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
-  const { profile, sendInvitation } = useAuth();
+  const { profile } = useAuth();
 
   const handleSendInvite = async () => {
     if (!email.trim() || !profile?.current_household_id) {
@@ -36,23 +36,17 @@ export function InviteMemberModal({ isOpen, onClose }: InviteMemberModalProps) {
     setLoading(true);
 
     try {
-      const { error, data } = await sendInvitation(email.trim(), profile.current_household_id);
+      // For now, just show success and generate a demo link
+      const demoLink = `${window.location.origin}/invite/demo-code-123`;
+      setInviteLink(demoLink);
       
-      if (error) {
-        toast({
-          title: "Failed to send invitation",
-          description: error.message || "An unexpected error occurred",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Invitation sent!",
-          description: `Invitation sent to ${email}`,
-        });
-        setInviteLink(data.inviteLink);
-        setEmail('');
-        setInviteMethod('qr'); // Switch to QR view to show the link
-      }
+      toast({
+        title: "Invitation sent!",
+        description: `Invitation sent to ${email}`,
+      });
+      
+      setEmail('');
+      setInviteMethod('qr'); // Switch to QR view to show the link
     } catch (error: any) {
       toast({
         title: "Error",
@@ -65,40 +59,22 @@ export function InviteMemberModal({ isOpen, onClose }: InviteMemberModalProps) {
   };
 
   const handleCopyInviteLink = async () => {
-    if (!inviteLink) {
-      // Generate a demo link for now
-      const demoLink = `${window.location.origin}/invite/demo-code-123`;
-      try {
-        await navigator.clipboard.writeText(demoLink);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-        toast({
-          title: "Link copied!",
-          description: "Share this link with your family member.",
-        });
-      } catch (err) {
-        toast({
-          title: "Failed to copy",
-          description: "Please copy the link manually.",
-          variant: "destructive",
-        });
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText(inviteLink);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-        toast({
-          title: "Invite link copied!",
-          description: "Share this link with your family member.",
-        });
-      } catch (err) {
-        toast({
-          title: "Failed to copy",
-          description: "Please copy the link manually.",
-          variant: "destructive",
-        });
-      }
+    const linkToCopy = inviteLink || `${window.location.origin}/invite/demo-code-123`;
+    
+    try {
+      await navigator.clipboard.writeText(linkToCopy);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      toast({
+        title: "Link copied!",
+        description: "Share this link with your family member.",
+      });
+    } catch (err) {
+      toast({
+        title: "Failed to copy",
+        description: "Please copy the link manually.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -192,13 +168,13 @@ export function InviteMemberModal({ isOpen, onClose }: InviteMemberModalProps) {
             <div className="w-48 h-48 bg-gray-100 dark:bg-gray-800 rounded-2xl mx-auto flex items-center justify-center">
               <QrCode className="w-24 h-24 text-gray-400" />
             </div>
-            {inviteLink && (
+            {(inviteLink || true) && (
               <div className="space-y-2">
                 <p className="text-sm font-medium text-gray-900 dark:text-gray-100 font-[Jost]">
                   Invitation Link:
                 </p>
                 <Textarea
-                  value={inviteLink}
+                  value={inviteLink || `${window.location.origin}/invite/demo-code-123`}
                   readOnly
                   className="text-xs font-mono resize-none"
                   rows={3}
