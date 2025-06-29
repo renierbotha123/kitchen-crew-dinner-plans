@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface ProtectedRouteProps {
@@ -10,6 +10,7 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, requireHousehold = false }: ProtectedRouteProps) {
   const { user, profile, userHouseholds, loading } = useAuth();
+  const location = useLocation();
 
   console.log('ProtectedRoute check:', { 
     loading, 
@@ -17,7 +18,8 @@ export function ProtectedRoute({ children, requireHousehold = false }: Protected
     profile: profile?.id, 
     currentHouseholdId: profile?.current_household_id,
     userHouseholdsCount: userHouseholds.length,
-    requireHousehold 
+    requireHousehold,
+    currentPath: location.pathname
   });
 
   if (loading) {
@@ -31,15 +33,19 @@ export function ProtectedRoute({ children, requireHousehold = false }: Protected
     );
   }
 
+  // If no user, redirect to welcome
   if (!user) {
     console.log('No user found, redirecting to welcome');
     return <Navigate to="/welcome" replace />;
   }
 
-  // If household is required
+  // If household is required but we're already on household-related pages, don't redirect
   if (requireHousehold) {
+    const householdPages = ['/household-setup', '/household-selection'];
+    const isOnHouseholdPage = householdPages.includes(location.pathname);
+    
     // If user has no current household selected
-    if (!profile?.current_household_id) {
+    if (!profile?.current_household_id && !isOnHouseholdPage) {
       // If user has existing households, let them select one
       if (userHouseholds.length > 0) {
         console.log('User has households but no current selection, redirecting to household selection');

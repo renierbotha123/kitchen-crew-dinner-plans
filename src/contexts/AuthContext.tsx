@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -211,7 +210,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Clean up auth state first
       cleanupAuthState();
       
-      // Clear local state
+      // Clear local state immediately
       setProfile(null);
       setUser(null);
       setSession(null);

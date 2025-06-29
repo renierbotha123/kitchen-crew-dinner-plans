@@ -18,14 +18,30 @@ export function HouseholdSetup() {
   const [inviteCode, setInviteCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [redirectChecked, setRedirectChecked] = useState(false);
 
-  // If user has existing households, redirect to selection page
+  // Only redirect if user has households AND we haven't checked yet
   useEffect(() => {
-    if (userHouseholds.length > 0) {
+    if (!redirectChecked && userHouseholds.length > 0) {
       console.log('User has existing households, redirecting to selection');
+      setRedirectChecked(true);
       navigate('/household-selection');
+    } else if (!redirectChecked) {
+      setRedirectChecked(true);
     }
-  }, [userHouseholds, navigate]);
+  }, [userHouseholds, navigate, redirectChecked]);
+
+  // Don't render anything until we've checked for redirect
+  if (!redirectChecked) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-[#019A52] border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400 font-[Jost]">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleCreateHousehold = async () => {
     if (!householdName.trim()) {
