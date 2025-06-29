@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -121,6 +120,7 @@ export function AIRecipeSearch({ onAddRecipe }: AIRecipeSearchProps) {
 
   const handleAddToMyRecipes = () => {
     if (selectedRecipe) {
+      // Format data for AddRecipeModal
       const recipeForModal = {
         title: selectedRecipe.title,
         image: selectedRecipe.cover_image_url || '',

@@ -40,6 +40,23 @@ export function AIRecipePreview({
     );
   }
 
+  const handleAddToMyRecipes = () => {
+    // Prepare data in the format expected by AddRecipeModal
+    const prefilledData = {
+      title: recipe.title || '',
+      image: recipe.cover_image_url || '',
+      prepTime: recipe.prep_time?.toString() || '',
+      cookTime: recipe.cook_time?.toString() || '',
+      serves: recipe.serves?.toString() || '',
+      method: recipe.method || '',
+      source: recipe.source || 'AI Generated',
+      ingredients: recipe.ingredients || [],
+      tags: [recipe.food_type, recipe.meal_type].filter(Boolean)
+    };
+    
+    onAddToMyRecipes();
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header with Back Button */}
@@ -170,7 +187,7 @@ export function AIRecipePreview({
             Show More Options
           </Button>
           <Button 
-            onClick={onAddToMyRecipes}
+            onClick={handleAddToMyRecipes}
             className="flex-1 h-12 rounded-full"
           >
             Add to My Recipes
