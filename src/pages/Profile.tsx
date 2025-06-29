@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   Settings, 
   Users, 
@@ -29,25 +30,7 @@ import { ShareAppSection } from '@/components/Profile/ShareAppSection';
 import { SettingsToggle } from '@/components/Profile/SettingsToggle';
 import { EditProfileModal } from '@/components/Profile/EditProfileModal';
 
-// Mock data
-const initialUser = {
-  id: '1',
-  name: 'Sarah Johnson',
-  email: 'sarah@email.com',
-  avatar: '',
-  dietaryPreferences: {
-    primaryDiet: 'vegetarian',
-    allergies: ['Nuts', 'Dairy'],
-    avoidIngredients: ['Mushrooms'],
-    favoriteCuisines: ['Italian', 'Mediterranean', 'Asian'],
-  },
-  notifications: {
-    mealPlanReminders: true,
-    shoppingListAlerts: true,
-    aiRecipeSuggestions: false,
-  },
-};
-
+// Mock data for household members and stats
 const householdMembers = [
   { id: '1', name: 'Sarah Johnson', email: 'sarah@email.com', role: 'Admin', avatar: '' },
   { id: '2', name: 'Mike Johnson', email: 'mike@email.com', role: 'Member', avatar: '' },
@@ -61,19 +44,51 @@ const stats = {
 
 export function Profile() {
   const { theme, toggleTheme } = useTheme();
+  const { signOut, profile, user } = useAuth();
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [notifications, setNotifications] = useState(true);
-  const [currentUser, setCurrentUser] = useState(initialUser);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // Use actual user data from auth context, with fallback to mock data
+  const currentUser = {
+    id: user?.id || '1',
+    name: profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'User' : 'Sarah Johnson',
+    email: profile?.email || user?.email || 'user@email.com',
+    avatar: '',
+    dietaryPreferences: {
+      primaryDiet: 'vegetarian',
+      allergies: ['Nuts', 'Dairy'],
+      avoidIngredients: ['Mushrooms'],
+      favoriteCuisines: ['Italian', 'Mediterranean', 'Asian'],
+    },
+    notifications: {
+      mealPlanReminders: true,
+      shoppingListAlerts: true,
+      aiRecipeSuggestions: false,
+    },
+  };
 
   const handleInviteMember = (email: string) => {
     console.log('Inviting member:', email);
     // TODO: Implement actual invite logic
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    
+    setIsLoggingOut(true);
     console.log('Logging out...');
-    // TODO: Implement actual logout logic
+    
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Force navigation even if logout fails
+      window.location.href = '/welcome';
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   const handleEditProfile = () => {
@@ -81,7 +96,6 @@ export function Profile() {
   };
 
   const handleSaveProfile = (updatedUser: any) => {
-    setCurrentUser(updatedUser);
     console.log('Profile updated:', updatedUser);
     // TODO: Implement actual save logic (API call)
   };
@@ -174,10 +188,11 @@ export function Profile() {
                 variant="destructive"
                 size="sm"
                 onClick={handleLogout}
+                disabled={isLoggingOut}
                 className="w-full"
               >
                 <LogOut className="w-4 h-4 mr-2" />
-                Log Out
+                {isLoggingOut ? 'Logging Out...' : 'Log Out'}
               </Button>
             </div>
           </Card>

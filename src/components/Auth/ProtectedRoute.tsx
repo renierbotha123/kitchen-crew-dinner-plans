@@ -35,6 +35,7 @@ export function ProtectedRoute({ children, requireHousehold = false }: Protected
     return <Navigate to="/welcome" replace />;
   }
 
+  // If household is required but user doesn't have one, redirect to household setup
   if (requireHousehold && !profile?.household_id) {
     console.log('Household required but not found, redirecting to household setup');
     return <Navigate to="/household-setup" replace />;
