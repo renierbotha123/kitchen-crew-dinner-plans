@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Settings, LogOut, Edit, Share, HelpCircle, ChefHat, Calendar } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { UserHeader } from '@/components/Profile/UserHeader';
 import { HouseholdMemberItem } from '@/components/Profile/HouseholdMemberItem';
 import { StatsCard } from '@/components/Profile/StatsCard';
@@ -16,6 +17,7 @@ import { Separator } from '@/components/ui/separator';
 
 export function Profile() {
   const { user, profile, signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isInviteMemberOpen, setIsInviteMemberOpen] = useState(false);
 
@@ -89,8 +91,8 @@ export function Profile() {
               icon={Settings}
               label="Dark Mode"
               description="Switch between light and dark themes"
-              checked={false}
-              onToggle={(enabled) => console.log('Dark mode:', enabled)}
+              checked={theme === 'dark'}
+              onToggle={toggleTheme}
             />
             <SettingsToggle
               icon={Settings}
