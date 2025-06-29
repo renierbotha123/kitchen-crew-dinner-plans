@@ -38,7 +38,7 @@ export function HouseholdMembersList({ householdId }: HouseholdMembersListProps)
             user_id,
             role,
             joined_at,
-            profiles:user_id (
+            profiles!user_households_user_id_fkey (
               first_name,
               last_name,
               email
@@ -159,10 +159,10 @@ export function HouseholdMembersList({ householdId }: HouseholdMembersListProps)
               </div>
             </div>
             <Badge 
-              variant={getRoleBadgeVariant(member.role)} 
+              variant={getRoleBadgeVariant(member.role || 'member')} 
               className="text-xs font-[Jost] capitalize"
             >
-              {member.role}
+              {member.role || 'member'}
             </Badge>
           </div>
         ))}
