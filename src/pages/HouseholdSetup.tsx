@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Home, Users, QrCode } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,13 +11,21 @@ import { Card } from '@/components/ui/card';
 
 export function HouseholdSetup() {
   const navigate = useNavigate();
-  const { user, refreshProfile, refreshUserHouseholds } = useAuth();
+  const { user, userHouseholds, refreshProfile, refreshUserHouseholds } = useAuth();
   
   const [mode, setMode] = useState<'choose' | 'create' | 'join'>('choose');
   const [householdName, setHouseholdName] = useState('');
   const [inviteCode, setInviteCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // If user has existing households, redirect to selection page
+  useEffect(() => {
+    if (userHouseholds.length > 0) {
+      console.log('User has existing households, redirecting to selection');
+      navigate('/household-selection');
+    }
+  }, [userHouseholds, navigate]);
 
   const handleCreateHousehold = async () => {
     if (!householdName.trim()) {
