@@ -9,53 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      household_invitations: {
-        Row: {
-          accepted_at: string | null
-          accepted_by: string | null
-          created_at: string
-          expires_at: string
-          household_id: string
-          id: string
-          invite_code: string
-          invited_by: string
-          invited_email: string
-          status: string
-        }
-        Insert: {
-          accepted_at?: string | null
-          accepted_by?: string | null
-          created_at?: string
-          expires_at?: string
-          household_id: string
-          id?: string
-          invite_code?: string
-          invited_by: string
-          invited_email: string
-          status?: string
-        }
-        Update: {
-          accepted_at?: string | null
-          accepted_by?: string | null
-          created_at?: string
-          expires_at?: string
-          household_id?: string
-          id?: string
-          invite_code?: string
-          invited_by?: string
-          invited_email?: string
-          status?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "household_invitations_household_id_fkey"
-            columns: ["household_id"]
-            isOneToOne: false
-            referencedRelation: "households"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       households: {
         Row: {
           created_at: string
@@ -115,6 +68,71 @@ export type Database = {
           {
             foreignKeyName: "profiles_current_household_id_fkey"
             columns: ["current_household_id"]
+            isOneToOne: false
+            referencedRelation: "households"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recipes: {
+        Row: {
+          cook_time_minutes: number | null
+          cover_image_url: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          food_type: string | null
+          household_id: string | null
+          id: string
+          ingredients: Json | null
+          meal_type: string | null
+          method: string | null
+          prep_time_minutes: number | null
+          serves: number | null
+          source: string | null
+          title: string
+          visibility: string
+        }
+        Insert: {
+          cook_time_minutes?: number | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          food_type?: string | null
+          household_id?: string | null
+          id?: string
+          ingredients?: Json | null
+          meal_type?: string | null
+          method?: string | null
+          prep_time_minutes?: number | null
+          serves?: number | null
+          source?: string | null
+          title: string
+          visibility?: string
+        }
+        Update: {
+          cook_time_minutes?: number | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          food_type?: string | null
+          household_id?: string | null
+          id?: string
+          ingredients?: Json | null
+          meal_type?: string | null
+          method?: string | null
+          prep_time_minutes?: number | null
+          serves?: number | null
+          source?: string | null
+          title?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipes_household_id_fkey"
+            columns: ["household_id"]
             isOneToOne: false
             referencedRelation: "households"
             referencedColumns: ["id"]

@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,12 +10,13 @@ interface AddRecipeModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (recipe: any) => void;
+  prefilledData?: any;
 }
 
 const FOOD_TYPES = ['Chicken', 'Beef', 'Fish', 'Pork', 'Vegetarian', 'Vegan', 'Pasta', 'Rice', 'Soup', 'Salad', 'Other'];
 const MEAL_TYPES = ['Healthy', 'Quick', 'Easy', 'Comfort Food', 'Spicy', 'Sweet', 'Low Carb', 'High Protein', "Other"];
 
-export function AddRecipeModal({ isOpen, onClose, onSubmit }: AddRecipeModalProps) {
+export function AddRecipeModal({ isOpen, onClose, onSubmit, prefilledData }: AddRecipeModalProps) {
   const [formData, setFormData] = useState({
     title: '',
     image: '',
@@ -30,6 +30,54 @@ export function AddRecipeModal({ isOpen, onClose, onSubmit }: AddRecipeModalProp
   const [currentIngredient, setCurrentIngredient] = useState('');
   const [foodType, setFoodType] = useState<string>('');
   const [mealType, setMealType] = useState<string>('');
+
+  // Pre-fill form when prefilledData changes
+  useEffect(() => {
+    if (prefilledData) {
+      setFormData({
+        title: prefilledData.title || '',
+        image: prefilledData.image || '',
+        cookTime: prefilledData.cookTime || '',
+        prepTime: prefilledData.prepTime || '',
+        serves: prefilledData.serves || '',
+        method: prefilledData.method || '',
+        source: prefilledData.source || 'AI Generated'
+      });
+      
+      setIngredients(prefilledData.ingredients || []);
+      
+      // Set tags from prefilled data
+      if (prefilledData.tags && prefilledData.tags.length > 0) {
+        const [firstTag, secondTag] = prefilledData.tags;
+        if (FOOD_TYPES.includes(firstTag)) {
+          setFoodType(firstTag);
+          setMealType(MEAL_TYPES.includes(secondTag) ? secondTag : '');
+        } else if (MEAL_TYPES.includes(firstTag)) {
+          setMealType(firstTag);
+          setFoodType(FOOD_TYPES.includes(secondTag) ? secondTag : '');
+        }
+      }
+    }
+  }, [prefilledData]);
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setFormData({
+        title: '',
+        image: '',
+        cookTime: '',
+        prepTime: '',
+        serves: '',
+        method: '',
+        source: 'User Added'
+      });
+      setIngredients([]);
+      setCurrentIngredient('');
+      setFoodType('');
+      setMealType('');
+    }
+  }, [isOpen]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -113,8 +161,15 @@ export function AddRecipeModal({ isOpen, onClose, onSubmit }: AddRecipeModalProp
             >
               <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Add New Recipe</h1>
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              {prefilledData ? 'Review & Add Recipe' : 'Add New Recipe'}
+            </h1>
           </div>
+          {prefilledData && (
+            <p className="text-sm text-muted-foreground">
+              Review the AI-generated recipe details and make any changes before adding to your collection.
+            </p>
+          )}
         </div>
 
         {/* Content - Form */}
@@ -284,7 +339,7 @@ export function AddRecipeModal({ isOpen, onClose, onSubmit }: AddRecipeModalProp
             disabled={!formData.title.trim()}
             className="w-full h-12"
           >
-            Add Recipe
+            {prefilledData ? 'Add to My Recipes' : 'Add Recipe'}
           </Button>
         </div>
       </div>

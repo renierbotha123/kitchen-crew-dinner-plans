@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Search, Plus } from 'lucide-react';
@@ -10,6 +9,7 @@ import { PantryItem } from '@/components/Recipes/PantryItem';
 import { AddRecipeModal } from '@/components/Recipes/AddRecipeModal';
 import { AddPantryItemModal } from '@/components/Recipes/AddPantryItemModal';
 import { MissingIngredientsAlert } from '@/components/Recipes/MissingIngredientsAlert';
+import { AIRecipeSearch } from '@/components/Recipes/AIRecipeSearch';
 
 // Mock data for recipes
 const mockRecipes = [
@@ -100,6 +100,7 @@ export function Recipes() {
   const [pantryItems, setPantryItems] = useState(mockPantryItems);
   const [showAddRecipeModal, setShowAddRecipeModal] = useState(false);
   const [showAddPantryModal, setShowAddPantryModal] = useState(false);
+  const [prefilledRecipeData, setPrefilledRecipeData] = useState<any>(null);
 
   // Filter recipes based on search and selected filters
   const filteredRecipes = recipes.filter(recipe => {
@@ -150,6 +151,12 @@ export function Recipes() {
     };
     setRecipes(prev => [recipe, ...prev]);
     setShowAddRecipeModal(false);
+    setPrefilledRecipeData(null);
+  };
+
+  const handleAIRecipeAdd = (aiRecipeData: any) => {
+    setPrefilledRecipeData(aiRecipeData);
+    setShowAddRecipeModal(true);
   };
 
   const handleAddPantryItem = (newItem: any) => {
@@ -172,25 +179,30 @@ export function Recipes() {
           
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsList className="grid w-full grid-cols-3 mb-4">
               <TabsTrigger value="recipes" className="text-sm font-medium">
                 Recipes
+              </TabsTrigger>
+              <TabsTrigger value="ai-assistant" className="text-sm font-medium">
+                AI Assistant
               </TabsTrigger>
               <TabsTrigger value="pantry" className="text-sm font-medium">
                 Pantry
               </TabsTrigger>
             </TabsList>
 
-            {/* Search Bar */}
-            <div className="relative mb-4">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder={activeTab === "recipes" ? "Search recipes..." : "Search pantry..."}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+            {/* Search Bar - Only show for recipes and pantry tabs */}
+            {activeTab !== "ai-assistant" && (
+              <div className="relative mb-4">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder={activeTab === "recipes" ? "Search recipes..." : "Search pantry..."}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            )}
 
             <TabsContent value="recipes" className="mt-0">
               {/* Filter Tags */}
@@ -223,6 +235,10 @@ export function Recipes() {
               </div>
             </TabsContent>
 
+            <TabsContent value="ai-assistant" className="mt-0">
+              <AIRecipeSearch onAddRecipe={handleAIRecipeAdd} />
+            </TabsContent>
+
             <TabsContent value="pantry" className="mt-0">
               {/* Missing Ingredients Alert */}
               {mockMissingIngredients.length > 0 && (
@@ -253,22 +269,28 @@ export function Recipes() {
         </div>
       </div>
 
-      {/* Floating Action Button */}
-      <FloatingActionButton
-        onClick={() => {
-          if (activeTab === "recipes") {
-            setShowAddRecipeModal(true);
-          } else {
-            setShowAddPantryModal(true);
-          }
-        }}
-      />
+      {/* Floating Action Button - Hide on AI Assistant tab */}
+      {activeTab !== "ai-assistant" && (
+        <FloatingActionButton
+          onClick={() => {
+            if (activeTab === "recipes") {
+              setShowAddRecipeModal(true);
+            } else {
+              setShowAddPantryModal(true);
+            }
+          }}
+        />
+      )}
 
       {/* Modals */}
       <AddRecipeModal
         isOpen={showAddRecipeModal}
-        onClose={() => setShowAddRecipeModal(false)}
+        onClose={() => {
+          setShowAddRecipeModal(false);
+          setPrefilledRecipeData(null);
+        }}
         onSubmit={handleAddRecipe}
+        prefilledData={prefilledRecipeData}
       />
 
       <AddPantryItemModal
