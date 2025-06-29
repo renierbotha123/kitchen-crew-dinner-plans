@@ -31,6 +31,17 @@ export function HouseholdMembersList({ householdId }: HouseholdMembersListProps)
       try {
         console.log('Fetching members for household:', householdId);
         
+        // Debug: Check total household members from admin perspective
+        const { data: allMembersCheck, error: allMembersError } = await supabase
+          .from('user_households')
+          .select('user_id, role, joined_at')
+          .eq('household_id', householdId);
+        
+        console.log('All members check (admin view):', allMembersCheck);
+        if (allMembersError) {
+          console.log('All members check error:', allMembersError);
+        }
+        
         // First get the user_households data
         const { data: householdMembersData, error: householdError } = await supabase
           .from('user_households')
