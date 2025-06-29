@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -5,6 +6,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus, ArrowLeft } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface AddRecipeModalProps {
   isOpen: boolean;
@@ -17,31 +20,37 @@ const FOOD_TYPES = ['Chicken', 'Beef', 'Fish', 'Pork', 'Vegetarian', 'Vegan', 'P
 const MEAL_TYPES = ['Healthy', 'Quick', 'Easy', 'Comfort Food', 'Spicy', 'Sweet', 'Low Carb', 'High Protein', "Other"];
 
 export function AddRecipeModal({ isOpen, onClose, onSubmit, prefilledData }: AddRecipeModalProps) {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     title: '',
+    description: '',
     image: '',
     cookTime: '',
     prepTime: '',
     serves: '',
     method: '',
-    source: 'User Added'
+    source: 'User Added',
+    visibility: 'public'
   });
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [currentIngredient, setCurrentIngredient] = useState('');
   const [foodType, setFoodType] = useState<string>('');
   const [mealType, setMealType] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Pre-fill form when prefilledData changes
   useEffect(() => {
     if (prefilledData) {
       setFormData({
         title: prefilledData.title || '',
+        description: prefilledData.description || '',
         image: prefilledData.image || '',
         cookTime: prefilledData.cookTime || '',
         prepTime: prefilledData.prepTime || '',
         serves: prefilledData.serves || '',
         method: prefilledData.method || '',
-        source: prefilledData.source || 'AI Generated'
+        source: prefilledData.source || 'AI Generated',
+        visibility: 'public'
       });
       
       setIngredients(prefilledData.ingredients || []);
@@ -65,12 +74,14 @@ export function AddRecipeModal({ isOpen, onClose, onSubmit, prefilledData }: Add
     if (!isOpen) {
       setFormData({
         title: '',
+        description: '',
         image: '',
         cookTime: '',
         prepTime: '',
         serves: '',
         method: '',
-        source: 'User Added'
+        source: 'User Added',
+        visibility: 'public'
       });
       setIngredients([]);
       setCurrentIngredient('');
@@ -108,37 +119,104 @@ export function AddRecipeModal({ isOpen, onClose, onSubmit, prefilledData }: Add
     setMealType(mealType === type ? '' : type);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const tags = [foodType, mealType].filter(tag => tag.length > 0);
-    
-    const recipe = {
-      ...formData,
-      cookTime: parseInt(formData.cookTime) || 0,
-      prepTime: parseInt(formData.prepTime) || 0,
-      serves: parseInt(formData.serves) || 1,
-      ingredients,
-      tags,
-      image: formData.image || "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=300&fit=crop"
-    };
+    if (!formData.title.trim()) {
+      toast({
+        title: "Error",
+        description: "Recipe title is required",
+        variant: "destructive"
+      });
+      return;
+    }
 
-    onSubmit(recipe);
-    
-    // Reset form
-    setFormData({
-      title: '',
-      image: '',
-      cookTime: '',
-      prepTime: '',
-      serves: '',
-      method: '',
-      source: 'User Added'
-    });
-    setIngredients([]);
-    setCurrentIngredient('');
-    setFoodType('');
-    setMealType('');
+    setIsSubmitting(true);
+
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to save recipes",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Prepare recipe data for database
+      const recipeData = {
+        title: formData.title.trim(),
+        description: formData.description.trim() || null,
+        cover_image_url: formData.image.trim() || null,
+        prep_time_minutes: formData.prepTime ? parseInt(formData.prepTime) : null,
+        cook_time_minutes: formData.cookTime ? parseInt(formData.cookTime) : null,
+        serves: formData.serves ? parseInt(formData.serves) : null,
+        method: formData.method.trim() || null,
+        source: formData.source.trim() || 'User Added',
+        visibility: formData.visibility as 'public' | 'private',
+        food_type: foodType || null,
+        meal_type: mealType || null,
+        ingredients: ingredients.length > 0 ? ingredients : null,
+        created_by: user.id,
+        household_id: null // Will be set by RLS/triggers if needed
+      };
+
+      // Insert into Supabase
+      const { data, error } = await supabase
+        .from('recipes')
+        .insert([recipeData])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Database error:', error);
+        toast({
+          title: "Error",
+          description: "Failed to save recipe. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Success! Close modal and notify parent
+      toast({
+        title: "Success",
+        description: "Recipe saved successfully!",
+      });
+
+      onSubmit(data);
+      onClose();
+
+      // Reset form
+      setFormData({
+        title: '',
+        description: '',
+        image: '',
+        cookTime: '',
+        prepTime: '',
+        serves: '',
+        method: '',
+        source: 'User Added',
+        visibility: 'public'
+      });
+      setIngredients([]);
+      setCurrentIngredient('');
+      setFoodType('');
+      setMealType('');
+
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -184,6 +262,19 @@ export function AddRecipeModal({ isOpen, onClose, onSubmit, prefilledData }: Add
                 onChange={(e) => handleInputChange('title', e.target.value)}
                 placeholder="Enter recipe title"
                 required
+                className="mt-1"
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => handleInputChange('description', e.target.value)}
+                placeholder="Brief description of the recipe"
+                rows={2}
                 className="mt-1"
               />
             </div>
@@ -324,9 +415,24 @@ export function AddRecipeModal({ isOpen, onClose, onSubmit, prefilledData }: Add
                 className="mt-1 w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm"
               >
                 <option value="User Added">User Added</option>
+                <option value="AI Generated">AI Generated</option>
                 <option value="URL">From Website</option>
                 <option value="Family Recipe">Family Recipe</option>
                 <option value="Cookbook">Cookbook</option>
+              </select>
+            </div>
+
+            {/* Visibility */}
+            <div>
+              <Label htmlFor="visibility">Visibility</Label>
+              <select
+                id="visibility"
+                value={formData.visibility}
+                onChange={(e) => handleInputChange('visibility', e.target.value)}
+                className="mt-1 w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm"
+              >
+                <option value="public">Public</option>
+                <option value="private">Private</option>
               </select>
             </div>
           </form>
@@ -336,10 +442,10 @@ export function AddRecipeModal({ isOpen, onClose, onSubmit, prefilledData }: Add
         <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 pb-6">
           <Button 
             onClick={handleSubmit} 
-            disabled={!formData.title.trim()}
-            className="w-full h-12"
+            disabled={!formData.title.trim() || isSubmitting}
+            className="w-full h-12 rounded-full"
           >
-            {prefilledData ? 'Add to My Recipes' : 'Add Recipe'}
+            {isSubmitting ? 'Saving...' : (prefilledData ? 'Add to My Recipes' : 'Add Recipe')}
           </Button>
         </div>
       </div>

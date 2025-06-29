@@ -144,9 +144,16 @@ export function Recipes() {
   };
 
   const handleAddRecipe = (newRecipe: any) => {
+    // Convert database recipe to display format
     const recipe = {
-      id: Date.now(),
-      ...newRecipe,
+      id: newRecipe.id,
+      title: newRecipe.title,
+      image: newRecipe.cover_image_url || "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=300&fit=crop",
+      cookTime: newRecipe.cook_time_minutes || 0,
+      prepTime: newRecipe.prep_time_minutes || 0,
+      serves: newRecipe.serves || 1,
+      tags: [newRecipe.food_type, newRecipe.meal_type].filter(Boolean),
+      source: newRecipe.source || 'User Added',
       isFavorited: false
     };
     setRecipes(prev => [recipe, ...prev]);
