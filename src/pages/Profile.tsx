@@ -65,16 +65,14 @@ export function Profile() {
           </h3>
           <div className="grid grid-cols-2 gap-4">
             <StatsCard
-              title="Recipes Saved"
+              label="Recipes Saved"
               value={12}
               icon={ChefHat}
-              color="bg-blue-500"
             />
             <StatsCard
-              title="Meals Planned"
+              label="Meals Planned"
               value={8}
               icon={Calendar}
-              color="bg-green-500"
             />
           </div>
         </div>
