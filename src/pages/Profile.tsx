@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Settings, LogOut, Edit, Share, HelpCircle } from 'lucide-react';
+import { Settings, LogOut, Edit, Share, HelpCircle, ChefHat, Calendar } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserHeader } from '@/components/Profile/UserHeader';
 import { HouseholdMemberItem } from '@/components/Profile/HouseholdMemberItem';
@@ -66,14 +66,14 @@ export function Profile() {
           <div className="grid grid-cols-2 gap-4">
             <StatsCard
               title="Recipes Saved"
-              value="12"
-              icon="🍳"
+              value={12}
+              icon={ChefHat}
               color="bg-blue-500"
             />
             <StatsCard
               title="Meals Planned"
-              value="8"
-              icon="📅"
+              value={8}
+              icon={Calendar}
               color="bg-green-500"
             />
           </div>
@@ -88,21 +88,24 @@ export function Profile() {
           </h3>
           <Card className="divide-y divide-gray-200 dark:divide-gray-700">
             <SettingsToggle
-              title="Dark Mode"
+              icon={Settings}
+              label="Dark Mode"
               description="Switch between light and dark themes"
-              enabled={false}
+              checked={false}
               onToggle={(enabled) => console.log('Dark mode:', enabled)}
             />
             <SettingsToggle
-              title="Push Notifications"
+              icon={Settings}
+              label="Push Notifications"
               description="Get notified about meal reminders"
-              enabled={true}
+              checked={true}
               onToggle={(enabled) => console.log('Notifications:', enabled)}
             />
             <SettingsToggle
-              title="Email Updates"
+              icon={Settings}
+              label="Email Updates"
               description="Receive weekly meal planning tips"
-              enabled={false}
+              checked={false}
               onToggle={(enabled) => console.log('Email updates:', enabled)}
             />
           </Card>
@@ -140,10 +143,20 @@ export function Profile() {
       <EditProfileModal
         isOpen={isEditProfileOpen}
         onClose={() => setIsEditProfileOpen(false)}
-        currentProfile={{
-          firstName: profile?.first_name || '',
-          lastName: profile?.last_name || '',
+        user={{
+          name: displayName,
           email: profile?.email || user?.email || '',
+          dietaryPreferences: {
+            primaryDiet: 'omnivore',
+            allergies: [],
+            avoidIngredients: [],
+            favoriteCuisines: [],
+          },
+          notifications: {
+            mealPlanReminders: true,
+            shoppingListAlerts: true,
+            aiRecipeSuggestions: false,
+          },
         }}
         onSave={(updatedProfile) => {
           console.log('Profile updated:', updatedProfile);

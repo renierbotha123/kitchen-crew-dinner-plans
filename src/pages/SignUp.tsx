@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Mail } from 'lucide-react';
@@ -28,7 +27,7 @@ export function SignUp() {
   useEffect(() => {
     if (!authLoading && user) {
       console.log('User already authenticated, redirecting...');
-      if (profile?.household_id) {
+      if (profile?.current_household_id) {
         navigate('/');
       } else {
         navigate('/household-setup');
