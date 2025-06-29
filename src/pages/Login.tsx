@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Mail } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 
 export function Login() {
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+  const { signIn, user, profile, loading: authLoading } = useAuth();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -20,6 +20,18 @@ export function Login() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
   const [generalError, setGeneralError] = useState('');
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!authLoading && user) {
+      console.log('User already authenticated, redirecting...');
+      if (profile?.household_id) {
+        navigate('/');
+      } else {
+        navigate('/household-setup');
+      }
+    }
+  }, [user, profile, authLoading, navigate]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -53,20 +65,39 @@ export function Login() {
     setGeneralError('');
 
     try {
+      console.log('Attempting login...');
       const { error } = await signIn(formData.email.trim(), formData.password);
 
       if (error) {
-        setGeneralError(error.message || 'Failed to log in');
+        console.error('Login error:', error);
+        if (error.message.includes('Invalid login credentials')) {
+          setGeneralError('Invalid email or password. Please try again.');
+        } else {
+          setGeneralError(error.message || 'Failed to log in');
+        }
       } else {
-        // Navigate to dashboard or household setup based on user's household status
-        navigate('/');
+        console.log('Login successful, auth context will handle navigation');
+        // Navigation will be handled by useEffect when user state updates
       }
     } catch (error) {
+      console.error('Unexpected login error:', error);
       setGeneralError('An unexpected error occurred');
     } finally {
       setLoading(false);
     }
   };
+
+  // Show loading state while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-[#019A52] border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400 font-[Jost]">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -75,7 +106,7 @@ export function Login() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/welcome')}
           className="rounded-full"
         >
           <ArrowLeft className="w-6 h-6" />

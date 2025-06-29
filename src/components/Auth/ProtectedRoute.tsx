@@ -11,12 +11,14 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children, requireHousehold = false }: ProtectedRouteProps) {
   const { user, profile, loading } = useAuth();
 
-  // TEMPORARY: Bypass all authentication checks
-  console.log('ProtectedRoute: Bypassing authentication (temporary)');
-  return <>{children}</>;
+  console.log('ProtectedRoute check:', { 
+    loading, 
+    user: user?.id, 
+    profile: profile?.id, 
+    householdId: profile?.household_id,
+    requireHousehold 
+  });
 
-  // Original code commented out for temporary bypass
-  /*
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -29,13 +31,14 @@ export function ProtectedRoute({ children, requireHousehold = false }: Protected
   }
 
   if (!user) {
+    console.log('No user found, redirecting to welcome');
     return <Navigate to="/welcome" replace />;
   }
 
   if (requireHousehold && !profile?.household_id) {
+    console.log('Household required but not found, redirecting to household setup');
     return <Navigate to="/household-setup" replace />;
   }
 
   return <>{children}</>;
-  */
 }
