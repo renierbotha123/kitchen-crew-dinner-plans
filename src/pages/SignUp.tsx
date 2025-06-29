@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Mail } from 'lucide-react';
@@ -9,7 +10,7 @@ import { Button } from '@/components/ui/button';
 
 export function SignUp() {
   const navigate = useNavigate();
-  const { signUp, user, profile, loading: authLoading } = useAuth();
+  const { signUp, user, loading: authLoading } = useAuth();
   
   const [formData, setFormData] = useState({
     firstName: '',
@@ -27,13 +28,9 @@ export function SignUp() {
   useEffect(() => {
     if (!authLoading && user) {
       console.log('User already authenticated, redirecting...');
-      if (profile?.current_household_id) {
-        navigate('/');
-      } else {
-        navigate('/household-setup');
-      }
+      navigate('/');
     }
-  }, [user, profile, authLoading, navigate]);
+  }, [user, authLoading, navigate]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -93,8 +90,8 @@ export function SignUp() {
           setGeneralError(error.message || 'Failed to create account');
         }
       } else {
-        console.log('Sign up successful, redirecting to household setup');
-        navigate('/household-setup');
+        console.log('Sign up successful');
+        // Navigation will be handled by ProtectedRoute after auth state updates
       }
     } catch (error) {
       console.error('Unexpected sign up error:', error);

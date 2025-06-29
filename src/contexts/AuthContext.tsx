@@ -59,6 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [userHouseholds, setUserHouseholds] = useState<UserHousehold[]>([]);
   const [loading, setLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -111,16 +112,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Defer profile and households fetching to prevent deadlocks
-          setTimeout(() => {
-            fetchProfile(session.user.id);
-            fetchUserHouseholds(session.user.id);
-          }, 0);
+          // Only fetch data if this is a new session or initial load
+          if (event === 'SIGNED_IN' || initialLoad) {
+            // Use setTimeout to prevent potential deadlocks
+            setTimeout(() => {
+              fetchProfile(session.user.id);
+              fetchUserHouseholds(session.user.id);
+            }, 0);
+          }
         } else {
           setProfile(null);
           setUserHouseholds([]);
         }
         
+        if (initialLoad) {
+          setInitialLoad(false);
+        }
         setLoading(false);
       }
     );
@@ -138,6 +145,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }, 0);
       }
       
+      setInitialLoad(false);
       setLoading(false);
     });
 
@@ -360,6 +368,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (joinError) {
         console.error('Error joining household:', joinError);
         return { error: joinError };
+      }
+
+      // Set as current household
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ current_household_id: household.id })
+        .eq('id', user.id);
+
+      if (profileError) {
+        console.error('Error setting current household:', profileError);
+        return { error: profileError };
       }
 
       // Refresh user data after joining

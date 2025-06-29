@@ -39,39 +39,38 @@ export function ProtectedRoute({ children, requireHousehold = false }: Protected
     return <Navigate to="/welcome" replace />;
   }
 
-  // Define household-related pages
-  const householdPages = ['/household-setup', '/household-selection'];
-  const isOnHouseholdPage = householdPages.includes(location.pathname);
-
-  // Handle household setup page access
+  // Special handling for household-specific routes
   if (location.pathname === '/household-setup') {
-    // Only allow access if user has NO households
+    // Only allow if user has NO households
     if (userHouseholds.length > 0) {
-      console.log('User has households, redirecting from setup to selection');
+      console.log('User has households, redirecting to selection');
       return <Navigate to="/household-selection" replace />;
     }
   }
 
-  // Handle household selection page access
   if (location.pathname === '/household-selection') {
-    // Only allow access if user has households but no current selection
+    // Only allow if user has households but no current selection
     if (userHouseholds.length === 0) {
-      console.log('User has no households, redirecting from selection to setup');
+      console.log('User has no households, redirecting to setup');
       return <Navigate to="/household-setup" replace />;
     }
   }
 
-  // If household is required for main app routes
+  if (location.pathname === '/join-household') {
+    // Allow access - this is for joining new households
+  }
+
+  // For main app routes that require household
   if (requireHousehold) {
     // If user has no households at all
-    if (userHouseholds.length === 0 && !isOnHouseholdPage) {
+    if (userHouseholds.length === 0) {
       console.log('User has no households, redirecting to household setup');
       return <Navigate to="/household-setup" replace />;
     }
     
     // If user has households but no current selection
-    if (userHouseholds.length > 0 && !profile?.current_household_id && !isOnHouseholdPage) {
-      console.log('User has households but no current selection, redirecting to household selection');
+    if (userHouseholds.length > 0 && !profile?.current_household_id) {
+      console.log('User has households but no current selection, redirecting to selection');
       return <Navigate to="/household-selection" replace />;
     }
   }

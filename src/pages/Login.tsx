@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Mail } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthButton } from '@/components/Auth/AuthButton';
@@ -9,7 +10,8 @@ import { Button } from '@/components/ui/button';
 
 export function Login() {
   const navigate = useNavigate();
-  const { signIn, user, profile, loading: authLoading } = useAuth();
+  const [searchParams] = useSearchParams();
+  const { signIn, user, loading: authLoading } = useAuth();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -20,17 +22,19 @@ export function Login() {
   const [loading, setLoading] = useState(false);
   const [generalError, setGeneralError] = useState('');
 
+  const redirectPath = searchParams.get('redirect');
+
   // Redirect if already authenticated
   useEffect(() => {
     if (!authLoading && user) {
       console.log('User already authenticated, redirecting...');
-      if (profile?.current_household_id) {
-        navigate('/');
+      if (redirectPath) {
+        navigate(redirectPath);
       } else {
-        navigate('/household-setup');
+        navigate('/');
       }
     }
-  }, [user, profile, authLoading, navigate]);
+  }, [user, authLoading, navigate, redirectPath]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -75,8 +79,8 @@ export function Login() {
           setGeneralError(error.message || 'Failed to log in');
         }
       } else {
-        console.log('Login successful, auth context will handle navigation');
-        // Navigation will be handled by useEffect when user state updates
+        console.log('Login successful');
+        // Navigation will be handled by the useEffect above
       }
     } catch (error) {
       console.error('Unexpected login error:', error);

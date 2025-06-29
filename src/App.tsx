@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { MealPlanProvider } from "./contexts/MealPlanContext";
@@ -20,11 +20,10 @@ import { Welcome } from "./pages/Welcome";
 import { SignUp } from "./pages/SignUp";
 import { Login } from "./pages/Login";
 import { HouseholdSetup } from "./pages/HouseholdSetup";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
 import { HouseholdSelection } from "./pages/HouseholdSelection";
 import { InviteAccept } from "./pages/InviteAccept";
 import { JoinHousehold } from "./pages/JoinHousehold";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +40,13 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-background">
       <Routes>
+        {/* Root redirect to dashboard */}
+        <Route path="/" element={
+          <ProtectedRoute requireHousehold={true}>
+            <Dashboard />
+          </ProtectedRoute>
+        } />
+        
         {/* Public Auth Routes */}
         <Route path="/welcome" element={<Welcome />} />
         <Route path="/signup" element={<SignUp />} />
@@ -56,14 +62,14 @@ function AppContent() {
           </ProtectedRoute>
         } />
         
-        {/* Household Setup - Protected but no household required - only for users with NO households */}
+        {/* Household Setup - Protected but no household required */}
         <Route path="/household-setup" element={
           <ProtectedRoute>
             <HouseholdSetup />
           </ProtectedRoute>
         } />
         
-        {/* Household Selection - Protected but no household required - only for users WITH households */}
+        {/* Household Selection - Protected but no household required */}
         <Route path="/household-selection" element={
           <ProtectedRoute>
             <HouseholdSelection />
@@ -71,7 +77,7 @@ function AppContent() {
         } />
         
         {/* Main App Routes - Protected and require household */}
-        <Route path="/" element={
+        <Route path="/dashboard" element={
           <ProtectedRoute requireHousehold={true}>
             <Dashboard />
           </ProtectedRoute>
