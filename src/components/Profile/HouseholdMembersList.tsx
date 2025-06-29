@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Users, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -43,13 +42,17 @@ export function HouseholdMembersList({ householdId }: HouseholdMembersListProps)
           return;
         }
 
+        console.log('Household members data:', householdMembersData);
+
         if (!householdMembersData || householdMembersData.length === 0) {
+          console.log('No household members found');
           setMembers([]);
           return;
         }
 
         // Get the user IDs
         const userIds = householdMembersData.map(member => member.user_id);
+        console.log('User IDs to fetch profiles for:', userIds);
 
         // Fetch profile data for these users
         const { data: profilesData, error: profilesError } = await supabase
@@ -61,6 +64,8 @@ export function HouseholdMembersList({ householdId }: HouseholdMembersListProps)
           console.error('Error fetching profiles:', profilesError);
           return;
         }
+
+        console.log('Profiles data:', profilesData);
 
         // Combine the data
         const transformedMembers = householdMembersData.map(member => {
@@ -75,7 +80,7 @@ export function HouseholdMembersList({ householdId }: HouseholdMembersListProps)
           };
         });
 
-        console.log('Transformed members data:', transformedMembers);
+        console.log('Final transformed members data:', transformedMembers);
         setMembers(transformedMembers);
       } catch (error) {
         console.error('Error fetching household members:', error);
