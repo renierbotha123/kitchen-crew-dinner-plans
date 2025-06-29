@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Home, Users, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Home, Users, ArrowRight, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -48,18 +48,18 @@ export function HouseholdSelection() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <div className="flex items-center justify-between p-4 pt-12">
+        <div className="w-10" />
+        <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100 font-[Jost]">
+          Select Household
+        </h1>
         <Button
           variant="ghost"
           size="icon"
           onClick={handleLogout}
           className="rounded-full"
         >
-          <ArrowLeft className="w-6 h-6" />
+          <LogOut className="w-6 h-6" />
         </Button>
-        <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100 font-[Jost]">
-          Select Household
-        </h1>
-        <div className="w-10" />
       </div>
 
       {/* Content */}

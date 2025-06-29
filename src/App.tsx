@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -40,14 +41,14 @@ function AppContent() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         
-        {/* Household Setup - Protected but no household required */}
+        {/* Household Setup - Protected but no household required - only for users with NO households */}
         <Route path="/household-setup" element={
           <ProtectedRoute>
             <HouseholdSetup />
           </ProtectedRoute>
         } />
         
-        {/* Household Selection - Protected but no household required */}
+        {/* Household Selection - Protected but no household required - only for users WITH households */}
         <Route path="/household-selection" element={
           <ProtectedRoute>
             <HouseholdSelection />

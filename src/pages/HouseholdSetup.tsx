@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Home, Users, QrCode } from 'lucide-react';
@@ -21,7 +20,7 @@ export function HouseholdSetup() {
   const [error, setError] = useState('');
   const [redirectChecked, setRedirectChecked] = useState(false);
 
-  // Only redirect if user has households AND we haven't checked yet
+  // If user has existing households, redirect them to household selection instead
   useEffect(() => {
     if (!redirectChecked && userHouseholds.length > 0) {
       console.log('User has existing households, redirecting to selection');
@@ -186,15 +185,11 @@ export function HouseholdSetup() {
     if (mode !== 'choose') {
       setMode('choose');
     } else {
-      // If user has households, go to household selection, otherwise logout
-      if (userHouseholds.length > 0) {
-        navigate('/household-selection');
-      } else {
-        try {
-          await signOut();
-        } catch (error) {
-          console.error('Logout error:', error);
-        }
+      // Since this page is only for users with NO households, logout when they go back
+      try {
+        await signOut();
+      } catch (error) {
+        console.error('Logout error:', error);
       }
     }
   };
