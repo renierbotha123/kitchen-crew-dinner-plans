@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,8 +31,7 @@ interface AuthContextType {
   refreshUserHouseholds: () => Promise<void>;
   selectHousehold: (householdId: string) => Promise<{ error: any }>;
   leaveHousehold: (householdId: string) => Promise<{ error: any }>;
-  sendInvitation: (email: string, householdId: string) => Promise<{ error: any; data?: any }>;
-  acceptInvitation: (inviteCode: string) => Promise<{ error: any; data?: any }>;
+  joinHouseholdByCode: (inviteCode: string) => Promise<{ error: any; data?: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -316,66 +316,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const sendInvitation = async (email: string, householdId: string) => {
-    if (!user?.id || !session?.access_token) {
-      return { error: { message: 'User not authenticated' } };
-    }
-
-    try {
-      console.log('Sending invitation:', { email, householdId });
-      
-      const { data, error } = await supabase.functions.invoke('send-invitation', {
-        body: {
-          email,
-          householdId
-        },
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      if (error) {
-        console.error('Error sending invitation:', error);
-        return { error };
-      }
-
-      console.log('Invitation sent successfully:', data);
-      return { error: null, data };
-    } catch (error: any) {
-      console.error('Error sending invitation:', error);
-      return { error };
-    }
-  };
-
-  const acceptInvitation = async (inviteCode: string) => {
+  const joinHouseholdByCode = async (inviteCode: string) => {
     if (!user?.id) {
       return { error: { message: 'User not authenticated' } };
     }
 
     try {
-      console.log('Accepting invitation:', inviteCode);
+      console.log('Joining household by code:', inviteCode);
       
-      const { data, error } = await supabase
-        .rpc('accept_household_invitation', {
-          invitation_code: inviteCode
+      // First, get the household by invite code
+      const { data: household, error: householdError } = await supabase
+        .from('households')
+        .select('id, name')
+        .eq('invite_code', inviteCode)
+        .single();
+
+      if (householdError || !household) {
+        console.error('Error finding household:', householdError);
+        return { error: { message: 'Invalid invite code' } };
+      }
+
+      // Check if user is already in the household
+      const { data: existingMembership } = await supabase
+        .from('user_households')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('household_id', household.id)
+        .single();
+
+      if (existingMembership) {
+        return { error: { message: 'You are already a member of this household' } };
+      }
+
+      // Add user to household
+      const { error: joinError } = await supabase
+        .from('user_households')
+        .insert({
+          user_id: user.id,
+          household_id: household.id,
+          role: 'member'
         });
 
-      if (error) {
-        console.error('Error accepting invitation:', error);
-        return { error };
+      if (joinError) {
+        console.error('Error joining household:', joinError);
+        return { error: joinError };
       }
 
-      if (!data.success) {
-        return { error: { message: data.error } };
-      }
-
-      // Refresh user data after accepting invitation
+      // Refresh user data after joining
       await Promise.all([refreshProfile(), refreshUserHouseholds()]);
       
-      console.log('Invitation accepted successfully:', data);
-      return { error: null, data };
+      console.log('Successfully joined household:', household.name);
+      return { 
+        error: null, 
+        data: { 
+          household_id: household.id,
+          household_name: household.name 
+        } 
+      };
     } catch (error: any) {
-      console.error('Error accepting invitation:', error);
+      console.error('Error joining household:', error);
       return { error };
     }
   };
@@ -394,8 +393,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       refreshUserHouseholds,
       selectHousehold,
       leaveHousehold,
-      sendInvitation,
-      acceptInvitation,
+      joinHouseholdByCode,
     }}>
       {children}
     </AuthContext.Provider>

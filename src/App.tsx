@@ -30,9 +30,9 @@ const queryClient = new QueryClient();
 function AppContent() {
   const location = useLocation();
   
-  // Don't show bottom nav on auth screens and invite page
+  // Don't show bottom nav on auth screens, invite page, and join household page
   const authRoutes = ['/welcome', '/signup', '/login', '/household-setup', '/household-selection'];
-  const hideNavRoutes = [...authRoutes, '/invite'];
+  const hideNavRoutes = [...authRoutes, '/invite', '/join-household'];
   const showBottomNav = !hideNavRoutes.some(route => 
     location.pathname === route || location.pathname.startsWith(route + '/')
   );
@@ -47,6 +47,13 @@ function AppContent() {
         
         {/* Invitation Route - Public but requires handling in component */}
         <Route path="/invite/:inviteCode" element={<InviteAccept />} />
+        
+        {/* Join Household Route - Protected */}
+        <Route path="/join-household" element={
+          <ProtectedRoute>
+            <JoinHousehold />
+          </ProtectedRoute>
+        } />
         
         {/* Household Setup - Protected but no household required - only for users with NO households */}
         <Route path="/household-setup" element={
