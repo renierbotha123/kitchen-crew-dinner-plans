@@ -29,20 +29,47 @@ export function HouseholdMembersList({ householdId }: HouseholdMembersListProps)
       if (!householdId) return;
 
       try {
+        console.log('=== DEBUGGING HOUSEHOLD MEMBERS ===');
         console.log('Fetching members for household:', householdId);
+        console.log('Current user ID:', user?.id);
         
-        // Debug: Check total household members from admin perspective
-        const { data: allMembersCheck, error: allMembersError } = await supabase
+        // First, let's check ALL households and their members (admin query)
+        console.log('--- Checking ALL user_households entries ---');
+        const { data: allHouseholds, error: allHouseholdsError } = await supabase
+          .from('user_households')
+          .select('user_id, household_id, role, joined_at');
+        
+        console.log('ALL user_households entries:', allHouseholds);
+        if (allHouseholdsError) {
+          console.log('Error fetching all households:', allHouseholdsError);
+        }
+        
+        // Check specifically for this household
+        console.log('--- Checking specific household members ---');
+        const { data: specificHouseholdMembers, error: specificError } = await supabase
           .from('user_households')
           .select('user_id, role, joined_at')
           .eq('household_id', householdId);
         
-        console.log('All members check (admin view):', allMembersCheck);
-        if (allMembersError) {
-          console.log('All members check error:', allMembersError);
+        console.log('Members in household', householdId, ':', specificHouseholdMembers);
+        if (specificError) {
+          console.log('Error fetching specific household members:', specificError);
         }
         
-        // First get the user_households data
+        // Check current user's households
+        console.log('--- Checking current user households ---');
+        const { data: currentUserHouseholds, error: currentUserError } = await supabase
+          .from('user_households')
+          .select('household_id, role, joined_at')
+          .eq('user_id', user?.id);
+        
+        console.log('Current user households:', currentUserHouseholds);
+        if (currentUserError) {
+          console.log('Error fetching current user households:', currentUserError);
+        }
+        
+        // Now try to fetch household members with the original query
+        console.log('--- Original query execution ---');
         const { data: householdMembersData, error: householdError } = await supabase
           .from('user_households')
           .select('user_id, role, joined_at')
@@ -53,7 +80,7 @@ export function HouseholdMembersList({ householdId }: HouseholdMembersListProps)
           return;
         }
 
-        console.log('Household members data:', householdMembersData);
+        console.log('Household members data (original query):', householdMembersData);
 
         if (!householdMembersData || householdMembersData.length === 0) {
           console.log('No household members found');
@@ -65,7 +92,19 @@ export function HouseholdMembersList({ householdId }: HouseholdMembersListProps)
         const userIds = householdMembersData.map(member => member.user_id);
         console.log('User IDs to fetch profiles for:', userIds);
 
+        // Check ALL profiles first
+        console.log('--- Checking ALL profiles ---');
+        const { data: allProfiles, error: allProfilesError } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name, email');
+        
+        console.log('ALL profiles in database:', allProfiles);
+        if (allProfilesError) {
+          console.log('Error fetching all profiles:', allProfilesError);
+        }
+
         // Fetch profile data for these users
+        console.log('--- Fetching specific profiles ---');
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
           .select('id, first_name, last_name, email')
@@ -76,7 +115,7 @@ export function HouseholdMembersList({ householdId }: HouseholdMembersListProps)
           return;
         }
 
-        console.log('Profiles data:', profilesData);
+        console.log('Profiles data for household members:', profilesData);
 
         // Combine the data
         const transformedMembers = householdMembersData.map(member => {
@@ -92,6 +131,7 @@ export function HouseholdMembersList({ householdId }: HouseholdMembersListProps)
         });
 
         console.log('Final transformed members data:', transformedMembers);
+        console.log('=== END DEBUGGING ===');
         setMembers(transformedMembers);
       } catch (error) {
         console.error('Error fetching household members:', error);
@@ -101,7 +141,7 @@ export function HouseholdMembersList({ householdId }: HouseholdMembersListProps)
     };
 
     fetchMembers();
-  }, [householdId]);
+  }, [householdId, user?.id]);
 
   const getDisplayName = (member: HouseholdMember) => {
     if (member.first_name && member.last_name) {
