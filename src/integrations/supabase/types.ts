@@ -39,34 +39,66 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          current_household_id: string | null
           email: string | null
           first_name: string | null
-          household_id: string | null
           id: string
           last_name: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
+          current_household_id?: string | null
           email?: string | null
           first_name?: string | null
-          household_id?: string | null
           id: string
           last_name?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
+          current_household_id?: string | null
           email?: string | null
           first_name?: string | null
-          household_id?: string | null
           id?: string
           last_name?: string | null
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "profiles_household_id_fkey"
+            foreignKeyName: "profiles_current_household_id_fkey"
+            columns: ["current_household_id"]
+            isOneToOne: false
+            referencedRelation: "households"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_households: {
+        Row: {
+          household_id: string
+          id: string
+          joined_at: string
+          role: string | null
+          user_id: string
+        }
+        Insert: {
+          household_id: string
+          id?: string
+          joined_at?: string
+          role?: string | null
+          user_id: string
+        }
+        Update: {
+          household_id?: string
+          id?: string
+          joined_at?: string
+          role?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_households_household_id_fkey"
             columns: ["household_id"]
             isOneToOne: false
             referencedRelation: "households"
@@ -82,6 +114,15 @@ export type Database = {
       get_user_household_id: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_user_households: {
+        Args: { user_uuid: string }
+        Returns: {
+          household_id: string
+          household_name: string
+          role: string
+          joined_at: string
+        }[]
       }
     }
     Enums: {

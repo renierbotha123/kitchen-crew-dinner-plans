@@ -9,13 +9,14 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, requireHousehold = false }: ProtectedRouteProps) {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, userHouseholds, loading } = useAuth();
 
   console.log('ProtectedRoute check:', { 
     loading, 
     user: user?.id, 
     profile: profile?.id, 
-    householdId: profile?.household_id,
+    currentHouseholdId: profile?.current_household_id,
+    userHouseholdsCount: userHouseholds.length,
     requireHousehold 
   });
 
@@ -35,10 +36,19 @@ export function ProtectedRoute({ children, requireHousehold = false }: Protected
     return <Navigate to="/welcome" replace />;
   }
 
-  // If household is required but user doesn't have one, redirect to household setup
-  if (requireHousehold && !profile?.household_id) {
-    console.log('Household required but not found, redirecting to household setup');
-    return <Navigate to="/household-setup" replace />;
+  // If household is required
+  if (requireHousehold) {
+    // If user has no current household selected
+    if (!profile?.current_household_id) {
+      // If user has existing households, let them select one
+      if (userHouseholds.length > 0) {
+        console.log('User has households but no current selection, redirecting to household selection');
+        return <Navigate to="/household-selection" replace />;
+      }
+      // If user has no households, send them to setup
+      console.log('User has no households, redirecting to household setup');
+      return <Navigate to="/household-setup" replace />;
+    }
   }
 
   return <>{children}</>;

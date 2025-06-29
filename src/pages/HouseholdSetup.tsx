@@ -11,7 +11,7 @@ import { Card } from '@/components/ui/card';
 
 export function HouseholdSetup() {
   const navigate = useNavigate();
-  const { user, refreshProfile } = useAuth();
+  const { user, refreshProfile, refreshUserHouseholds } = useAuth();
   
   const [mode, setMode] = useState<'choose' | 'create' | 'join'>('choose');
   const [householdName, setHouseholdName] = useState('');
@@ -36,10 +36,10 @@ export function HouseholdSetup() {
     try {
       console.log('Creating household with user ID:', user.id);
       
-      // Create household - the RLS policy allows any authenticated user to insert
+      // Create household
       const { data: household, error: householdError } = await supabase
         .from('households')
-        .insert([{ name: householdName.trim() }])
+        .insert([{ name: householdName.trim(), created_by: user.id }])
         .select()
         .single();
 
@@ -50,10 +50,24 @@ export function HouseholdSetup() {
 
       console.log('Created household:', household);
 
-      // Update user profile with household_id
+      // Add user to household as admin
+      const { error: membershipError } = await supabase
+        .from('user_households')
+        .insert([{
+          user_id: user.id,
+          household_id: household.id,
+          role: 'admin'
+        }]);
+
+      if (membershipError) {
+        console.error('Membership creation error:', membershipError);
+        throw membershipError;
+      }
+
+      // Set as current household
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({ household_id: household.id })
+        .update({ current_household_id: household.id })
         .eq('id', user.id);
 
       if (profileError) {
@@ -61,10 +75,10 @@ export function HouseholdSetup() {
         throw profileError;
       }
 
-      console.log('Profile updated with household_id:', household.id);
+      console.log('Profile updated with current_household_id:', household.id);
 
-      // Refresh profile and navigate to dashboard
-      await refreshProfile();
+      // Refresh profile and households, then navigate
+      await Promise.all([refreshProfile(), refreshUserHouseholds()]);
       navigate('/');
     } catch (error: any) {
       console.error('Full error details:', error);
@@ -105,10 +119,24 @@ export function HouseholdSetup() {
 
       console.log('Found household:', household);
 
-      // Update user profile with household_id
+      // Add user to household as member
+      const { error: membershipError } = await supabase
+        .from('user_households')
+        .insert([{
+          user_id: user.id,
+          household_id: household.id,
+          role: 'member'
+        }]);
+
+      if (membershipError) {
+        console.error('Membership creation error:', membershipError);
+        throw membershipError;
+      }
+
+      // Set as current household
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({ household_id: household.id })
+        .update({ current_household_id: household.id })
         .eq('id', user.id);
 
       if (profileError) {
@@ -116,10 +144,10 @@ export function HouseholdSetup() {
         throw profileError;
       }
 
-      console.log('Profile updated with household_id:', household.id);
+      console.log('Profile updated with current_household_id:', household.id);
 
-      // Refresh profile and navigate to dashboard
-      await refreshProfile();
+      // Refresh profile and households, then navigate
+      await Promise.all([refreshProfile(), refreshUserHouseholds()]);
       navigate('/');
     } catch (error: any) {
       console.error('Full error details:', error);

@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,6 +21,7 @@ import { Login } from "./pages/Login";
 import { HouseholdSetup } from "./pages/HouseholdSetup";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import { HouseholdSelection } from "./pages/HouseholdSelection";
 
 const queryClient = new QueryClient();
 
@@ -29,7 +29,7 @@ function AppContent() {
   const location = useLocation();
   
   // Don't show bottom nav on auth screens
-  const authRoutes = ['/welcome', '/signup', '/login', '/household-setup'];
+  const authRoutes = ['/welcome', '/signup', '/login', '/household-setup', '/household-selection'];
   const showBottomNav = !authRoutes.includes(location.pathname);
 
   return (
@@ -44,6 +44,13 @@ function AppContent() {
         <Route path="/household-setup" element={
           <ProtectedRoute>
             <HouseholdSetup />
+          </ProtectedRoute>
+        } />
+        
+        {/* Household Selection - Protected but no household required */}
+        <Route path="/household-selection" element={
+          <ProtectedRoute>
+            <HouseholdSelection />
           </ProtectedRoute>
         } />
         
