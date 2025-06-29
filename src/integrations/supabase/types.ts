@@ -166,6 +166,10 @@ export type Database = {
         Args: { p_household_id: string; p_invited_email: string }
         Returns: Json
       }
+      generate_invite_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_user_household_id: {
         Args: Record<PropertyKey, never>
         Returns: string

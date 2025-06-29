@@ -1,7 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Home, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { ErrorMessage } from '@/components/Auth/ErrorMessage';
 import { HouseholdInviteCard } from './HouseholdInviteCard';
@@ -21,6 +22,47 @@ export function HouseholdManagement() {
   const { userHouseholds, profile, leaveHousehold } = useAuth();
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState('');
+  const [inviteCode, setInviteCode] = useState<string>('');
+  const [fetchingCode, setFetchingCode] = useState(false);
+
+  // Find current household
+  const currentHousehold = userHouseholds.find(
+    household => household.household_id === profile?.current_household_id
+  );
+
+  // Fetch the actual invite code from the households table
+  useEffect(() => {
+    const fetchInviteCode = async () => {
+      if (!currentHousehold?.household_id) return;
+
+      setFetchingCode(true);
+      try {
+        console.log('Fetching invite code for household:', currentHousehold.household_id);
+        
+        const { data, error } = await supabase
+          .from('households')
+          .select('invite_code')
+          .eq('id', currentHousehold.household_id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching invite code:', error);
+          setError('Failed to load invite code');
+          return;
+        }
+
+        console.log('Invite code fetched:', data?.invite_code);
+        setInviteCode(data?.invite_code || '');
+      } catch (error) {
+        console.error('Error fetching invite code:', error);
+        setError('Failed to load invite code');
+      } finally {
+        setFetchingCode(false);
+      }
+    };
+
+    fetchInviteCode();
+  }, [currentHousehold?.household_id]);
 
   const handleLeaveHousehold = async (householdId: string, householdName: string) => {
     setLoading(householdId);
@@ -38,11 +80,6 @@ export function HouseholdManagement() {
       setLoading(null);
     }
   };
-
-  // Find current household
-  const currentHousehold = userHouseholds.find(
-    household => household.household_id === profile?.current_household_id
-  );
 
   if (userHouseholds.length === 0) {
     return (
@@ -76,9 +113,6 @@ export function HouseholdManagement() {
     );
   }
 
-  // Get the household's invite code (using household_id as invite code for now)
-  const inviteCode = currentHousehold.household_id;
-
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 font-[Jost]">
@@ -87,14 +121,21 @@ export function HouseholdManagement() {
       
       {error && <ErrorMessage message={error} />}
 
-      <HouseholdInviteCard
-        household={currentHousehold}
-        inviteCode={inviteCode}
-        onLeaveHousehold={(householdId, householdName) => {
-          // This will be handled by the AlertDialog in HouseholdInviteCard
-          handleLeaveHousehold(householdId, householdName);
-        }}
-      />
+      {fetchingCode ? (
+        <Card className="p-6 text-center">
+          <p className="text-gray-600 dark:text-gray-400 font-[Jost]">
+            Loading household settings...
+          </p>
+        </Card>
+      ) : (
+        <HouseholdInviteCard
+          household={currentHousehold}
+          inviteCode={inviteCode}
+          onLeaveHousehold={(householdId, householdName) => {
+            handleLeaveHousehold(householdId, householdName);
+          }}
+        />
+      )}
     </div>
   );
 }
