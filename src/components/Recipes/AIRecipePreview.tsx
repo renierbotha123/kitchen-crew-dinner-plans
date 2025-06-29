@@ -119,7 +119,7 @@ export function AIRecipePreview({
       {/* Ingredients */}
       {recipe.ingredients && recipe.ingredients.length > 0 && (
         <div className="space-y-3">
-          <h3 ClassName="text-lg font-semibold text-foreground">Ingredients</h3>
+          <h3 className="text-lg font-semibold text-foreground">Ingredients</h3>
           <ul className="space-y-2">
             {recipe.ingredients.map((ingredient, index) => (
               <li key={index} className="flex items-start space-x-3">
