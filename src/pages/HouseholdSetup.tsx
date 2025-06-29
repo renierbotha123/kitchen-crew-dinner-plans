@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Home, Users, ArrowRight } from 'lucide-react';
+import { Home, Users, ArrowRight, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,7 @@ import { ErrorMessage } from '@/components/Auth/ErrorMessage';
 
 export function HouseholdSetup() {
   const navigate = useNavigate();
-  const { user, refreshProfile, refreshUserHouseholds } = useAuth();
+  const { user, refreshProfile, refreshUserHouseholds, signOut } = useAuth();
   const [householdName, setHouseholdName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -94,10 +94,29 @@ export function HouseholdSetup() {
     navigate('/join-household');
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="text-center pt-16 pb-8">
+      <div className="text-center pt-16 pb-8 relative">
+        {/* Logout button in top right */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleLogout}
+          className="absolute top-4 right-4 rounded-full"
+          disabled={loading}
+        >
+          <LogOut className="w-5 h-5" />
+        </Button>
+
         <div className="bg-[#019A52] p-4 rounded-3xl w-16 h-16 mx-auto mb-6 flex items-center justify-center">
           <Home className="w-8 h-8 text-white" />
         </div>
