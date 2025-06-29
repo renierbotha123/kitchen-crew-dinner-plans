@@ -329,30 +329,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error: { message: 'User not authenticated' } };
     }
 
+    if (!inviteCode || !inviteCode.trim()) {
+      return { error: { message: 'Please enter an invite code' } };
+    }
+
     try {
       console.log('Joining household by code:', inviteCode);
       
       // First, get the household by invite code
       const { data: household, error: householdError } = await supabase
         .from('households')
-        .select('id, name')
-        .eq('invite_code', inviteCode)
-        .single();
+        .select('id, name, invite_code')
+        .eq('invite_code', inviteCode.trim())
+        .maybeSingle();
 
-      if (householdError || !household) {
+      console.log('Household query result:', { household, householdError });
+
+      if (householdError) {
         console.error('Error finding household:', householdError);
+        return { error: { message: 'Failed to validate invite code' } };
+      }
+
+      if (!household) {
+        console.log('No household found with invite code:', inviteCode);
         return { error: { message: 'Invalid invite code' } };
       }
 
       // Check if user is already in the household
-      const { data: existingMembership } = await supabase
+      const { data: existingMembership, error: membershipError } = await supabase
         .from('user_households')
         .select('id')
         .eq('user_id', user.id)
         .eq('household_id', household.id)
-        .single();
+        .maybeSingle();
+
+      if (membershipError) {
+        console.error('Error checking existing membership:', membershipError);
+        return { error: { message: 'Failed to check membership status' } };
+      }
 
       if (existingMembership) {
+        console.log('User already in household');
         return { error: { message: 'You are already a member of this household' } };
       }
 
@@ -367,7 +384,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (joinError) {
         console.error('Error joining household:', joinError);
-        return { error: joinError };
+        return { error: { message: 'Failed to join household' } };
       }
 
       // Set as current household
@@ -378,7 +395,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (profileError) {
         console.error('Error setting current household:', profileError);
-        return { error: profileError };
+        return { error: { message: 'Failed to set current household' } };
       }
 
       // Refresh user data after joining
@@ -393,8 +410,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } 
       };
     } catch (error: any) {
-      console.error('Error joining household:', error);
-      return { error };
+      console.error('Unexpected error joining household:', error);
+      return { error: { message: 'An unexpected error occurred' } };
     }
   };
 

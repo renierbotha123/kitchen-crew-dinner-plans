@@ -23,7 +23,7 @@ export function JoinHousehold() {
   const [householdName, setHouseholdName] = useState('');
 
   const handleJoinByCode = async (code: string) => {
-    if (!code.trim()) {
+    if (!code || !code.trim()) {
       setError('Please enter an invite code');
       return;
     }
@@ -32,24 +32,32 @@ export function JoinHousehold() {
     setError('');
 
     try {
-      const { error, data } = await joinHouseholdByCode(code.trim());
+      console.log('Attempting to join household with code:', code);
       
-      if (error) {
-        setError(error.message || 'Failed to join household');
+      const result = await joinHouseholdByCode(code.trim());
+      
+      console.log('Join result:', result);
+      
+      if (result.error) {
+        console.error('Join error:', result.error);
+        setError(result.error.message || 'Failed to join household');
       } else {
+        console.log('Successfully joined household:', result.data);
         setSuccess(true);
-        setHouseholdName(data.household_name);
+        setHouseholdName(result.data?.household_name || 'Unknown Household');
+        
         toast({
           title: "Success!",
-          description: `Joined ${data.household_name} successfully`,
+          description: `Joined ${result.data?.household_name || 'household'} successfully`,
         });
         
         // Redirect after a short delay
         setTimeout(() => {
-          navigate('/household-selection');
+          navigate('/dashboard');
         }, 2000);
       }
     } catch (error: any) {
+      console.error('Unexpected error:', error);
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);
@@ -63,12 +71,21 @@ export function JoinHousehold() {
   const handleQRScan = (result: string) => {
     setShowScanner(false);
     
+    console.log('QR scan result:', result);
+    
     // Extract invite code from URL or use direct code
     let code = result;
-    if (result.includes('/join?code=')) {
+    if (result.includes('/invite/')) {
+      // Handle invite URLs like https://domain.com/invite/CODE
+      const parts = result.split('/invite/');
+      code = parts[parts.length - 1];
+    } else if (result.includes('code=')) {
+      // Handle URLs with query params like https://domain.com/join?code=CODE
       const urlParams = new URLSearchParams(result.split('?')[1]);
       code = urlParams.get('code') || result;
     }
+    
+    console.log('Extracted code from QR:', code);
     
     setInviteCode(code);
     handleJoinByCode(code);
@@ -89,7 +106,7 @@ export function JoinHousehold() {
               You've successfully joined the household.
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-500 font-[Jost]">
-              Redirecting you to select your household...
+              Redirecting you to your dashboard...
             </p>
           </div>
         </Card>
@@ -151,7 +168,10 @@ export function JoinHousehold() {
                 type="text"
                 placeholder="Enter your invite code"
                 value={inviteCode}
-                onChange={(e) => setInviteCode(e.target.value)}
+                onChange={(e) => {
+                  setInviteCode(e.target.value);
+                  if (error) setError(''); // Clear error when user starts typing
+                }}
                 className="rounded-2xl"
                 disabled={loading}
               />
