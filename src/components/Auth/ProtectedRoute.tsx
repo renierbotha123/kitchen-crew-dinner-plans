@@ -39,19 +39,19 @@ export function ProtectedRoute({ children, requireHousehold = false }: Protected
     return <Navigate to="/welcome" replace />;
   }
 
-  // If household is required but we're already on household-related pages, don't redirect
+  // If household is required, check household status
   if (requireHousehold) {
     const householdPages = ['/household-setup', '/household-selection'];
     const isOnHouseholdPage = householdPages.includes(location.pathname);
     
-    // If user has no current household selected
-    if (!profile?.current_household_id && !isOnHouseholdPage) {
-      // If user has existing households, let them select one
-      if (userHouseholds.length > 0) {
-        console.log('User has households but no current selection, redirecting to household selection');
-        return <Navigate to="/household-selection" replace />;
-      }
-      // If user has no households, send them to setup
+    // If user has households but no current selection, and not already on household pages
+    if (userHouseholds.length > 0 && !profile?.current_household_id && !isOnHouseholdPage) {
+      console.log('User has households but no current selection, redirecting to household selection');
+      return <Navigate to="/household-selection" replace />;
+    }
+    
+    // If user has no households at all, and not already on household pages
+    if (userHouseholds.length === 0 && !isOnHouseholdPage) {
       console.log('User has no households, redirecting to household setup');
       return <Navigate to="/household-setup" replace />;
     }

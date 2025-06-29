@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Home, Users, ArrowRight } from 'lucide-react';
+import { Home, Users, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -9,7 +9,7 @@ import { ErrorMessage } from '@/components/Auth/ErrorMessage';
 
 export function HouseholdSelection() {
   const navigate = useNavigate();
-  const { userHouseholds, selectHousehold } = useAuth();
+  const { userHouseholds, selectHousehold, signOut } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -36,13 +36,30 @@ export function HouseholdSelection() {
     navigate('/household-setup');
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="flex items-center justify-center p-4 pt-12">
+      <div className="flex items-center justify-between p-4 pt-12">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleLogout}
+          className="rounded-full"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </Button>
         <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100 font-[Jost]">
           Select Household
         </h1>
+        <div className="w-10" />
       </div>
 
       {/* Content */}

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Home, Users, QrCode } from 'lucide-react';
@@ -11,7 +12,7 @@ import { Card } from '@/components/ui/card';
 
 export function HouseholdSetup() {
   const navigate = useNavigate();
-  const { user, userHouseholds, refreshProfile, refreshUserHouseholds } = useAuth();
+  const { user, userHouseholds, refreshProfile, refreshUserHouseholds, signOut } = useAuth();
   
   const [mode, setMode] = useState<'choose' | 'create' | 'join'>('choose');
   const [householdName, setHouseholdName] = useState('');
@@ -181,6 +182,23 @@ export function HouseholdSetup() {
     }
   };
 
+  const handleBackNavigation = async () => {
+    if (mode !== 'choose') {
+      setMode('choose');
+    } else {
+      // If user has households, go to household selection, otherwise logout
+      if (userHouseholds.length > 0) {
+        navigate('/household-selection');
+      } else {
+        try {
+          await signOut();
+        } catch (error) {
+          console.error('Logout error:', error);
+        }
+      }
+    }
+  };
+
   if (mode === 'choose') {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -189,7 +207,7 @@ export function HouseholdSetup() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate(-1)}
+            onClick={handleBackNavigation}
             className="rounded-full"
           >
             <ArrowLeft className="w-6 h-6" />
@@ -266,7 +284,7 @@ export function HouseholdSetup() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setMode('choose')}
+            onClick={handleBackNavigation}
             className="rounded-full"
           >
             <ArrowLeft className="w-6 h-6" />
@@ -318,7 +336,7 @@ export function HouseholdSetup() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setMode('choose')}
+            onClick={handleBackNavigation}
             className="rounded-full"
           >
             <ArrowLeft className="w-6 h-6" />
