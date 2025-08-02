@@ -7,6 +7,10 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-route
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { MealPlanProvider } from "./contexts/MealPlanContext";
+import { NotesProvider } from "./contexts/NotesContext";
+import { PantryProvider } from "./contexts/PantryContext";
+import { ShoppingListProvider } from "./contexts/ShoppingListContext";
+import { RecipeFavoritesProvider } from "./contexts/RecipeFavoritesContext";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
 import { BottomNavigation } from "./components/Layout/BottomNavigation";
 import { Dashboard } from "./pages/Dashboard";
@@ -146,15 +150,23 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <AuthProvider>
-        <MealPlanProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <AppContent />
-            </BrowserRouter>
-          </TooltipProvider>
-        </MealPlanProvider>
+        <NotesProvider>
+          <PantryProvider>
+            <ShoppingListProvider>
+              <RecipeFavoritesProvider>
+                <MealPlanProvider>
+                  <TooltipProvider>
+                    <Toaster />
+                    <Sonner />
+                    <BrowserRouter>
+                      <AppContent />
+                    </BrowserRouter>
+                  </TooltipProvider>
+                </MealPlanProvider>
+              </RecipeFavoritesProvider>
+            </ShoppingListProvider>
+          </PantryProvider>
+        </NotesProvider>
       </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>
